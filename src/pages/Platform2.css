@@ -68,6 +68,56 @@
   font-size: 1rem;
 }
 
+.cb-path-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.cb-path-card {
+  text-decoration: none;
+  color: inherit;
+  display: grid;
+  gap: 0.55rem;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.cb-path-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.cb-path-card h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--bg-deep);
+}
+
+.cb-path-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.cb-agent-title {
+  margin: 0.35rem 0 0.5rem;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  color: var(--bg-deep);
+}
+
+.cb-agent-learn {
+  margin: 0.35rem 0 1.25rem;
+  font-size: 0.9rem;
+}
+
+.cb-agent-learn a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
 .cb-how h2 {
   margin: 0 0 1rem;
   font-size: 1.1rem;

@@ -1,55 +1,47 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Layers, LineChart, Target } from 'lucide-react'
+import { ArrowRight, BookOpen, Bot } from 'lucide-react'
 import './Platform2.css'
 
 export function Welcome() {
   return (
     <div className="cb-page cb-welcome">
       <section className="cb-hero">
-        <p className="cb-kicker">Platform 2 · Learning &amp; capacity building</p>
-        <h1>Build AI capability across your dairy operations</h1>
+        <p className="cb-kicker">Platform 2 · Capacity building</p>
+        <h1>Learn with modules, or run an agent on your data</h1>
         <p className="cb-lede">
-          Structured learning modules help your team use AI-assisted agents for forecasting,
-          planning, inventory, procurement, and more — starting with simulated company data, then
-          applying the same methods to your own.
+          Use learning modules to build skill step by step. If your company files are already
+          ready, open an operational agent, upload a CSV, and run the analysis without the lesson.
         </p>
-        <Link to="/pathways" className="btn btn-primary cb-cta">
-          Choose a learning module <ArrowRight size={18} />
-        </Link>
       </section>
 
-      <section className="cb-card cb-how">
-        <h2>How each module works</h2>
-        <ol className="cb-steps-list">
-          <li>
-            <span className="cb-step-icon" aria-hidden>
-              <Target size={18} />
-            </span>
-            <div>
-              <strong>Learning objectives</strong>
-              <p>See what your team will be able to do after the module.</p>
-            </div>
-          </li>
-          <li>
-            <span className="cb-step-icon" aria-hidden>
-              <LineChart size={18} />
-            </span>
-            <div>
-              <strong>Simulated company data</strong>
-              <p>Practice on realistic SME data before using live operational records.</p>
-            </div>
-          </li>
-          <li>
-            <span className="cb-step-icon" aria-hidden>
-              <Layers size={18} />
-            </span>
-            <div>
-              <strong>Apply to your company</strong>
-              <p>Use the same agent workflow on your data for predictions and better decisions.</p>
-            </div>
-          </li>
-        </ol>
-      </section>
+      <div className="cb-path-grid">
+        <Link to="/pathways" className="cb-card cb-path-card">
+          <span className="cb-step-icon" aria-hidden>
+            <BookOpen size={20} />
+          </span>
+          <h2>Learning modules</h2>
+          <p>
+            Guided path: objectives, simulated data, exercises, knowledge check, then apply to
+            company files.
+          </p>
+          <span className="cb-module-action">
+            Choose a module <ArrowRight size={16} />
+          </span>
+        </Link>
+        <Link to="/agents" className="cb-card cb-path-card">
+          <span className="cb-step-icon" aria-hidden>
+            <Bot size={20} />
+          </span>
+          <h2>Use an agent</h2>
+          <p>
+            No teaching screens. Pick an agent, upload your sales or operations file, and get
+            recommendations.
+          </p>
+          <span className="cb-module-action">
+            Choose an agent <ArrowRight size={16} />
+          </span>
+        </Link>
+      </div>
     </div>
   )
 }

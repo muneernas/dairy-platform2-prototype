@@ -22,6 +22,9 @@ export function Layout() {
           <NavLink to="/pathways" className="nav-link">
             Learning modules
           </NavLink>
+          <NavLink to="/agents" className="nav-link">
+            Agents
+          </NavLink>
         </nav>
       </header>
       <main className="main">

@@ -394,6 +394,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           <button type="button" className="btn btn-primary" onClick={() => setPhase('learning')}>
             Begin module <ArrowRight size={16} />
           </button>
+          <p className="cb-agent-learn">
+            Already have company files?{' '}
+            <Link to={`/agents/${module.id}`}>Skip the lesson and use the agent</Link>
+          </p>
         </div>
       </div>
     )
@@ -414,7 +418,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           </p>
           <p className="cb-score">Knowledge check: {assessmentScore}%</p>
           <div className="cb-complete-actions">
-            <Link to="/pathways" className="btn btn-primary">
+            <Link to={`/agents/${module.id}`} className="btn btn-primary">
+              Use this agent on new data
+            </Link>
+            <Link to="/pathways" className="btn btn-ghost">
               Back to modules
             </Link>
             <button type="button" className="btn btn-ghost" onClick={() => {

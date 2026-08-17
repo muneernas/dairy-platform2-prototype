@@ -21,9 +21,11 @@ interface Props {
   items: ApplyDataItem[]
   analysis: CompanyAnalysis | null
   onAnalysis: (result: CompanyAnalysis | null) => void
+  intro?: string
+  runHint?: string
 }
 
-export function CompanyApplyStep({ items, analysis, onAnalysis }: Props) {
+export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }: Props) {
   const [loaded, setLoaded] = useState<Record<string, LoadedItem>>({})
   const [error, setError] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
@@ -101,8 +103,8 @@ export function CompanyApplyStep({ items, analysis, onAnalysis }: Props) {
   return (
     <div className="cb-step-body">
       <p>
-        Attach the operational files your company would export. If you do not have a live file yet,
-        load the demo company export to see how the same forecasting agent runs on “real” data.
+        {intro ??
+          'Attach the operational files your company would export. If you do not have a live file yet, load the demo company export to see how the same forecasting agent runs on “real” data.'}
       </p>
 
       <ol className="cb-apply-items">
@@ -162,7 +164,8 @@ export function CompanyApplyStep({ items, analysis, onAnalysis }: Props) {
       <div className="cb-run-box">
         <p>
           {salesReady
-            ? 'Sales file is ready. Run the forecasting agent on this dataset — not the training table from earlier in the module.'
+            ? runHint ??
+              'Sales file is ready. Run the forecasting agent on this dataset — not the training table from earlier in the module.'
             : 'Load the required sales file (demo or upload) to enable analysis.'}
         </p>
         <button
