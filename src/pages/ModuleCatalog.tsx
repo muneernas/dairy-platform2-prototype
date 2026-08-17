@@ -60,6 +60,11 @@ export function ModuleCatalog() {
               </div>
               <h2>{mod.title}</h2>
               <p>{mod.description}</p>
+              <p className="cb-module-time">
+                {available
+                  ? `${mod.duration} to walk through this demo`
+                  : `Full session: ${mod.workshopDuration ?? mod.duration}`}
+              </p>
               {available ? (
                 <span className="cb-module-action">
                   Start module <ArrowRight size={16} />

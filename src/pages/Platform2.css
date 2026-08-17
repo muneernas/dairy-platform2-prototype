@@ -224,6 +224,12 @@
   font-size: 0.9rem;
 }
 
+.cb-module-time {
+  font-size: 0.82rem !important;
+  font-weight: 600;
+  color: var(--accent-ink) !important;
+}
+
 .cb-module-action {
   display: inline-flex;
   align-items: center;

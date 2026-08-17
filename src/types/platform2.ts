@@ -15,6 +15,7 @@ export interface LearningModuleMeta {
   description: string
   status: ModuleStatus
   duration: string
+  workshopDuration?: string
   learningObjectives: string[]
 }
 

@@ -25,7 +25,8 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Trains companies to use historical sales, customer orders, seasonality, and external signals to estimate future demand by product category or SKU — reducing waste, preventing stockouts, and improving production planning.',
     status: 'pilot',
-    duration: '2–3 hours',
+    duration: 'About 10 minutes',
+    workshopDuration: '2–3 hours',
     learningObjectives: [
       'Read historical sales patterns by SKU and channel',
       'Identify seasonality and demand spikes relevant to dairy products',
@@ -132,7 +133,8 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
   description:
     'Trains companies to use historical sales, customer orders, seasonality, and external signals to estimate future demand by product category or SKU.',
   status: 'pilot',
-  duration: '2–3 hours',
+  duration: 'About 10 minutes',
+  workshopDuration: '2–3 hours',
   learningObjectives: [
     'Read historical sales patterns by SKU and channel',
     'Identify seasonality and demand spikes relevant to dairy products',

@@ -376,7 +376,13 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           <p className="cb-kicker">Module {module.number}</p>
           <h1>{module.title}</h1>
           <p className="cb-muted">{module.description}</p>
-          <p className="cb-duration">Estimated time: {module.duration}</p>
+          <p className="cb-duration">This walkthrough: {module.duration}</p>
+          {module.workshopDuration && (
+            <p className="cb-muted">
+              A facilitated session with your team and live company data is typically{' '}
+              {module.workshopDuration}.
+            </p>
+          )}
           <div className="cb-intro-objectives">
             <p className="cb-info-label">You will learn to</p>
             <ul>
