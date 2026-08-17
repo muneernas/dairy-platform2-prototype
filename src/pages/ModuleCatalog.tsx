@@ -63,7 +63,7 @@ export function ModuleCatalog() {
               <p className="cb-module-time">
                 {available
                   ? `${mod.duration} to walk through this demo`
-                  : `Full session: ${mod.workshopDuration ?? mod.duration}`}
+                  : `${mod.duration} · self-paced`}
               </p>
               {available ? (
                 <span className="cb-module-action">

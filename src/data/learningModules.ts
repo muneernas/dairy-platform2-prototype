@@ -10,7 +10,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Introduces SMEs to AI platforms for designing simple agents linked to business tasks — preparing data, defining instructions, testing outputs, and integrating recommendations into daily decisions.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [
       'Understand how AI agents support dairy operational decisions',
       'Prepare a small operational dataset for agent use',
@@ -26,7 +26,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
       'Trains companies to use historical sales, customer orders, seasonality, and external signals to estimate future demand by product category or SKU — reducing waste, preventing stockouts, and improving production planning.',
     status: 'pilot',
     duration: 'About 10 minutes',
-    workshopDuration: '2–3 hours',
+    fullDuration: '45–90 minutes',
     learningObjectives: [
       'Read historical sales patterns by SKU and channel',
       'Identify seasonality and demand spikes relevant to dairy products',
@@ -41,7 +41,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Focuses on analysing confirmed and pending orders by product, customer, channel, and delivery date — identifying demand signals, customer patterns, and coordination needs between sales, production, and logistics.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -51,7 +51,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Shows how forecasted and confirmed demand can be translated into feasible production schedules considering line capacity, labour, raw materials, packaging, cleaning, and changeover constraints.',
     status: 'planned',
-    duration: '3–4 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -61,7 +61,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Trains companies to organise production runs to reduce changeovers, cleaning time, delays, and product losses — especially relevant for milk, yoghurt, cheese, and ice cream lines.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -71,7 +71,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Helps SMEs track finished goods, raw materials, packaging, and semi-finished products across batches and locations — detecting shortages, excess stock, slow-moving items, and operational constraints.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -81,7 +81,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Focuses on expiry dates, remaining shelf life, batch age, and product usability — supporting FEFO dispatching, loss reduction, and stock rotation decisions.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -91,7 +91,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Trains companies to use AI for raw milk procurement and purchasing of ingredients, cultures, packaging, and other inputs — combining supplier prices, lead times, quality, and reliability.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -101,7 +101,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Introduces maintenance data, downtime records, alarms, and asset information to identify equipment at risk of failure — relevant for pasteurisers, fillers, pumps, refrigeration, compressors, and CIP assets.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -111,7 +111,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Shows how to calculate product, customer, or channel profitability by combining prices, costs, logistics, utilities, returns, and production data.',
     status: 'planned',
-    duration: '3–4 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
   {
@@ -121,7 +121,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     description:
       'Trains companies to organise and analyse complaints related to quality, packaging, delivery conditions, temperature abuse, and expiry — linking data to batches and corrective action.',
     status: 'planned',
-    duration: '2–3 hours',
+    duration: '45–90 minutes',
     learningObjectives: [],
   },
 ]
@@ -134,7 +134,7 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
     'Trains companies to use historical sales, customer orders, seasonality, and external signals to estimate future demand by product category or SKU.',
   status: 'pilot',
   duration: 'About 10 minutes',
-  workshopDuration: '2–3 hours',
+  fullDuration: '45–90 minutes',
   learningObjectives: [
     'Read historical sales patterns by SKU and channel',
     'Identify seasonality and demand spikes relevant to dairy products',

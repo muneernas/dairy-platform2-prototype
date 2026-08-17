@@ -377,10 +377,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           <h1>{module.title}</h1>
           <p className="cb-muted">{module.description}</p>
           <p className="cb-duration">This walkthrough: {module.duration}</p>
-          {module.workshopDuration && (
+          {module.fullDuration && (
             <p className="cb-muted">
-              A facilitated session with your team and live company data is typically{' '}
-              {module.workshopDuration}.
+              The complete self-paced module — with your own data, fuller exercises, and an action
+              plan — is typically {module.fullDuration}.
             </p>
           )}
           <div className="cb-intro-objectives">
