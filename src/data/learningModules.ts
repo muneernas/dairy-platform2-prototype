@@ -1,4 +1,5 @@
 import type { LearningModuleMeta, ModuleDetail } from '../types/platform2'
+import { FORECAST_APPLY_ITEMS } from './demoCompanyData'
 
 /** Eleven learning modules — aligned with Nicos (Platform 2) email, Aug 2026 */
 export const LEARNING_MODULES: LearningModuleMeta[] = [
@@ -293,14 +294,7 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
         'Sales and order analysis for dairy SMEs: combining historical sales with confirmed/pending orders by delivery date improves short-horizon forecast accuracy and coordinates sales, production, and logistics.',
     },
   ],
-  applyChecklist: [
-    'Export 8–12 weeks of sales or shipment history by SKU from your ERP or spreadsheets',
-    'Tag known events (holidays, school terms, promotions, Ramadan) in a simple calendar table',
-    'Run the same forecasting agent workflow on your dataset (not the simulated one)',
-    'Review Week-ahead forecast with sales and production leads before locking the plan',
-    'Track forecast error weekly for yogurt and milk — adjust tolerance bands for perishable SKUs',
-    'Document one decision where the forecast prevented waste or a stockout',
-  ],
+  applyItems: FORECAST_APPLY_ITEMS,
 }
 
 const MODULE_DETAILS: Record<string, ModuleDetail> = {

@@ -55,6 +55,17 @@ export interface AgentInsight {
   risks: string[]
 }
 
+export interface ApplyDataItem {
+  id: string
+  required: boolean
+  title: string
+  description: string
+  fileName: string
+  demoFileName: string
+  demoLabel: string
+  demoCsv: string
+}
+
 export interface ModuleDetail extends LearningModuleMeta {
   companyProfile: {
     name: string
@@ -66,7 +77,7 @@ export interface ModuleDetail extends LearningModuleMeta {
   exercises: ExerciseStep[]
   agentInsight: AgentInsight
   assessment: AssessmentQuestion[]
-  applyChecklist: string[]
+  applyItems: ApplyDataItem[]
 }
 
 export const MODULE_STEPS: { id: ModuleStepId; label: string; description: string }[] = [
@@ -98,6 +109,6 @@ export const MODULE_STEPS: { id: ModuleStepId; label: string; description: strin
   {
     id: 'apply-company',
     label: 'Apply to your company',
-    description: 'Bridge from simulation to your own operational data',
+    description: 'Upload your operational files — or use the demo company export — and run the same analysis',
   },
 ]

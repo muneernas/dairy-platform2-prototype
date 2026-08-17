@@ -3,8 +3,10 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronDown, Sparkles } from 'lucide-react'
 import { OptionChips } from '../components/OptionChips'
 import { ProgressBar } from '../components/ProgressBar'
+import { CompanyApplyStep } from '../components/CompanyApplyStep'
 import { getModuleDetail } from '../data/learningModules'
 import { askForecastAgent } from '../lib/nexosClient'
+import type { CompanyAnalysis } from '../lib/companyForecast'
 import { MODULE_STEPS, type ModuleDetail, type ModuleStepId } from '../types/platform2'
 import './Platform2.css'
 
@@ -33,7 +35,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   const [exerciseFeedback, setExerciseFeedback] = useState<Record<string, 'correct' | 'incorrect'>>({})
   const [assessmentAnswers, setAssessmentAnswers] = useState<Record<string, string>>({})
   const [assessmentFeedback, setAssessmentFeedback] = useState<Record<string, boolean>>({})
-  const [checklist, setChecklist] = useState<Record<number, boolean>>({})
+  const [companyAnalysis, setCompanyAnalysis] = useState<CompanyAnalysis | null>(null)
   const [agentQuestion, setAgentQuestion] = useState('')
   const [agentReply, setAgentReply] = useState<{ content: string; source: 'nexos' | 'mock' } | null>(
     null,
@@ -89,6 +91,8 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
         return Boolean(assessmentAnswers[currentAssessment.id])
       case 'agent-analysis':
         return agentRevealed
+      case 'apply-company':
+        return Boolean(companyAnalysis)
       default:
         return true
     }
@@ -350,23 +354,11 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
       case 'apply-company':
         return (
-          <div className="cb-step-body">
-            <p>
-              Complete these actions to apply this module to your own company data.
-            </p>
-            <div className="cb-checklist">
-              {module.applyChecklist.map((item, idx) => (
-                <label key={item}>
-                  <input
-                    type="checkbox"
-                    checked={Boolean(checklist[idx])}
-                    onChange={(e) => setChecklist((prev) => ({ ...prev, [idx]: e.target.checked }))}
-                  />
-                  <span>{item}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+          <CompanyApplyStep
+            items={module.applyItems}
+            analysis={companyAnalysis}
+            onAnalysis={setCompanyAnalysis}
+          />
         )
 
       default:
@@ -408,8 +400,11 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           <CheckCircle2 size={40} className="cb-complete-icon" aria-hidden />
           <h1>Module complete</h1>
           <p>
-            You finished the demand forecasting module on simulated data. Next, apply the same
-            workflow to your company&apos;s sales and order history.
+            You practised on simulated data, then ran the forecasting agent on company files
+            {companyAnalysis
+              ? ` (${companyAnalysis.companyLabel}).`
+              : '.'}{' '}
+            Use the same export-and-review loop each week before locking production.
           </p>
           <p className="cb-score">Knowledge check: {assessmentScore}%</p>
           <div className="cb-complete-actions">
@@ -421,6 +416,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               setStepIndex(0)
               setExerciseIndex(0)
               setAssessmentIndex(0)
+              setCompanyAnalysis(null)
             }}>
               Review module
             </button>
