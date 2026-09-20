@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
 import { Download, FileSpreadsheet, Play, Upload } from 'lucide-react'
 import {
-  analyseCompanySales,
   rowsToEvents,
   rowsToSales,
   type CompanyAnalysis,
 } from '../lib/companyForecast'
+import { runForecastAgent } from '../lib/forecastAgent'
 import { downloadTextFile, parseCsv } from '../lib/parseCsv'
 import type { ApplyDataItem } from '../types/platform2'
 
@@ -89,13 +89,28 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
         setRunning(false)
         return
       }
-      const result = analyseCompanySales(
-        salesRows,
-        eventRows,
-        loaded.sales.source,
-        loaded.sales.source === 'demo' ? salesItem.demoLabel : loaded.sales.fileLabel,
-      )
-      onAnalysis(result)
+      const result = runForecastAgent({
+        sales: salesRows,
+        events: eventRows,
+        source: loaded.sales.source,
+        companyLabel:
+          loaded.sales.source === 'demo' ? salesItem.demoLabel : loaded.sales.fileLabel,
+      })
+      // Keep CompanyAnalysis for parent state; enrich eventsUsed with SKU links from agent
+      onAnalysis({
+        ...result.analysis,
+        eventsUsed:
+          result.insight.externalSignalsUsed?.map(
+            (s) => `${s.period}: ${s.eventName} [${s.eventType}] → ${s.linkedSkus}`,
+          ) ?? result.analysis.eventsUsed,
+        recommendations: result.insight.recommendations,
+        risks: result.insight.risks,
+        forecasts: result.analysis.forecasts.map((f, i) => ({
+          ...f,
+          forecastUnits: result.insight.forecasts[i]?.forecastUnits ?? f.forecastUnits,
+          trend: result.insight.forecasts[i]?.trend ?? f.trend,
+        })),
+      })
       setRunning(false)
     }, 700)
   }
@@ -211,7 +226,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
           </div>
           {analysis.eventsUsed.length > 0 && (
             <div>
-              <p className="cb-info-label">Calendar signals used</p>
+              <p className="cb-info-label">External signals used</p>
               <ul className="cb-list">
                 {analysis.eventsUsed.map((e) => (
                   <li key={e}>{e}</li>

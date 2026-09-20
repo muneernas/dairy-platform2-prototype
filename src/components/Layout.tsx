@@ -20,7 +20,7 @@ export function Layout() {
             Home
           </NavLink>
           <NavLink to="/pathways" className="nav-link">
-            Learning modules
+            Training courses
           </NavLink>
           <NavLink to="/agents" className="nav-link">
             Agents

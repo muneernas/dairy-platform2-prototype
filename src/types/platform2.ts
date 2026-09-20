@@ -27,6 +27,21 @@ export interface SimulatedDataRow {
   channel: string
 }
 
+export interface ExternalSignalRow {
+  period: string
+  eventName: string
+  eventType: string
+  expectedImpact?: string
+  notes?: string
+}
+
+export interface ExternalSignalUsed {
+  period: string
+  eventName: string
+  eventType: string
+  linkedSkus: string
+}
+
 export interface ExerciseStep {
   id: string
   prompt: string
@@ -52,6 +67,7 @@ export interface AgentInsight {
   headline: string
   summary: string
   forecasts: { sku: string; nextPeriod: string; forecastUnits: number; trend: 'up' | 'down' | 'stable' }[]
+  externalSignalsUsed?: ExternalSignalUsed[]
   recommendations: string[]
   risks: string[]
 }
@@ -75,6 +91,7 @@ export interface ModuleDetail extends LearningModuleMeta {
     note: string
   }
   simulatedData: SimulatedDataRow[]
+  externalSignals?: ExternalSignalRow[]
   exercises: ExerciseStep[]
   agentInsight: AgentInsight
   assessment: AssessmentQuestion[]
@@ -84,13 +101,13 @@ export interface ModuleDetail extends LearningModuleMeta {
 export const MODULE_STEPS: { id: ModuleStepId; label: string; description: string }[] = [
   {
     id: 'objectives',
-    label: 'Learning objectives',
-    description: 'What your team will be able to do after this module',
+    label: 'Course objectives',
+    description: 'What your team will be able to do after this training course',
   },
   {
     id: 'simulated-data',
-    label: 'Simulated company data',
-    description: 'Practice with a realistic dairy SME dataset',
+    label: 'Practice company data',
+    description: 'Sales history plus external signals calendar (holidays, promotions, school terms)',
   },
   {
     id: 'exercise',

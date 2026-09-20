@@ -511,6 +511,33 @@
   color: var(--muted);
 }
 
+.cb-agent-engine {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent, #1f6b5c);
+}
+
+
+.cb-table-compact th,
+.cb-table-compact td {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.55rem;
+}
+
+.cb-signal-type {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: #e7f0ed;
+  color: var(--accent-ink, #1f6b5c);
+}
+
 .cb-feedback {
   border-radius: 10px;
   padding: 0.85rem 1rem;

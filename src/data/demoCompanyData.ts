@@ -43,11 +43,11 @@ Week 10,White cheese 250g,Cheese,1080,Retail
 Week 10,Labneh 400g,Fermented,800,Horeca
 `
 
-export const DEMO_EVENTS_CSV = `period,event
-Week 5,School term start — breakfast yogurt lift
-Week 6,Retail promotion on yogurt 500g
-Week 9,Local holiday weekend
-Week 11,Expected Ramadan preparation (next period)
+export const DEMO_EVENTS_CSV = `period,event_name,event_type,expected_impact,notes
+Week 5,School term start,school_term,yogurt_up,Back-to-school breakfast demand for single-serve packs
+Week 6,Retail promotion on yogurt 500g,promotion,yogurt_up,Chain-wide 15% discount
+Week 9,Local holiday weekend,holiday,milk_stable,Shorter retail week; horeca steady
+Week 11,Ramadan preparation,ramadan,cheese_up,Household stock-up before fasting period
 `
 
 export const FORECAST_APPLY_ITEMS: ApplyDataItem[] = [
@@ -65,12 +65,12 @@ export const FORECAST_APPLY_ITEMS: ApplyDataItem[] = [
   {
     id: 'events',
     required: false,
-    title: 'Calendar events',
+    title: 'External signals file',
     description:
-      'Optional. Tag holidays, school terms, promotions, and Ramadan so the agent can explain spikes. Columns: period, event.',
-    fileName: 'company-events.csv',
-    demoFileName: 'demo-jordan-valley-events.csv',
-    demoLabel: 'Jordan Valley Dairy Co. calendar (demo)',
+      'Optional but recommended. Calendar of holidays, school terms, promotions, Ramadan, and weather. Columns: period, event_name, event_type, expected_impact, notes.',
+    fileName: 'company-external-signals.csv',
+    demoFileName: 'demo-jordan-valley-external-signals.csv',
+    demoLabel: 'Jordan Valley Dairy Co. external signals (demo)',
     demoCsv: DEMO_EVENTS_CSV,
   },
 ]

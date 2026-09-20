@@ -18,11 +18,11 @@ export function ModuleCatalog() {
   return (
     <div className="cb-page">
       <header className="cb-page-head">
-        <p className="cb-kicker">Learning pathways</p>
-        <h1>Choose a module</h1>
+        <p className="cb-kicker">Training courses</p>
+        <h1>Choose a course</h1>
         <p>
-          Eleven topics for digital and green transition in dairy SMEs. Modules will be prioritised
-          after the company consultation questionnaire.
+          Ten topics for digital and green transition in dairy SMEs — aligned with the company
+          consultation questionnaire.
         </p>
       </header>
 

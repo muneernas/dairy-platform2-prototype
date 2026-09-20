@@ -9,6 +9,8 @@ export interface CompanySalesRow {
 export interface CalendarEvent {
   period: string
   event: string
+  eventType?: string
+  expectedImpact?: string
 }
 
 export interface SkuForecast {
@@ -63,7 +65,9 @@ export function rowsToEvents(rows: Record<string, string>[]): CalendarEvent[] {
   return rows
     .map((row) => ({
       period: pick(row, ['period', 'week', 'date']),
-      event: pick(row, ['event', 'note', 'tag', 'calendar_event']),
+      event: pick(row, ['event', 'event_name', 'note', 'tag', 'calendar_event']),
+      eventType: pick(row, ['event_type', 'type', 'category']),
+      expectedImpact: pick(row, ['expected_impact', 'impact']),
     }))
     .filter((row) => row.period && row.event)
 }
@@ -106,9 +110,24 @@ export function analyseCompanySales(
 
   const highVol = forecasts.filter((f) => f.volatility === 'high')
   const rising = forecasts.filter((f) => f.trend === 'up')
-  const eventsUsed = events.map((e) => `${e.period}: ${e.event}`)
+  const eventsUsed = events.map((e) => {
+    const type = e.eventType ? ` [${e.eventType}]` : ''
+    const impact = e.expectedImpact ? ` → ${e.expectedImpact}` : ''
+    return `${e.period}: ${e.event}${type}${impact}`
+  })
+
+  const hasSchoolOrPromo = events.some(
+    (e) =>
+      e.eventType === 'school_term' ||
+      e.eventType === 'promotion' ||
+      /school|promo/i.test(e.event),
+  )
+  const yogurtHigh = highVol.some((f) => /yogurt/i.test(f.sku))
 
   const recommendations = [
+    hasSchoolOrPromo && yogurtHigh
+      ? 'External signals explain the yogurt spike (school term / promotion). Confirm with sales before locking Week 9 volume.'
+      : null,
     highVol.length
       ? `Use a forecast band (not a single number) for ${highVol.map((f) => f.sku).join(', ')} — perishable SKUs with high volatility.`
       : 'Volatility is moderate across SKUs. Keep a short weekly review before locking production.',
@@ -116,9 +135,9 @@ export function analyseCompanySales(
       ? `Confirm capacity and milk intake for rising SKUs: ${rising.map((f) => f.sku).join(', ')}.`
       : 'No sharp upward SKUs this period — watch for under-production if orders rebound.',
     eventsUsed.length
-      ? `Calendar events were included (${eventsUsed.length}). Recheck the next-week plan against those dates.`
-      : 'No calendar file was attached. Tag holidays, school terms, and promotions next time to improve the forecast.',
-  ]
+      ? `${eventsUsed.length} external signal(s) loaded — recheck the plan against those calendar dates.`
+      : 'No external signals file attached. Add holidays, school terms, and promotions to explain spikes.',
+  ].filter(Boolean) as string[]
 
   const risks = [
     ...highVol.map((f) => `Waste risk: ${f.sku} (high volatility, last ${f.lastUnits.toLocaleString()} units)`),

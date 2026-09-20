@@ -6,8 +6,17 @@ import { ProgressBar } from '../components/ProgressBar'
 import { CompanyApplyStep } from '../components/CompanyApplyStep'
 import { getModuleDetail } from '../data/learningModules'
 import { askForecastAgent } from '../lib/nexosClient'
+import {
+  answerForecastFollowUp,
+  runForecastAgentOnPractice,
+} from '../lib/forecastAgent'
 import type { CompanyAnalysis } from '../lib/companyForecast'
-import { MODULE_STEPS, type ModuleDetail, type ModuleStepId } from '../types/platform2'
+import {
+  MODULE_STEPS,
+  type AgentInsight,
+  type ModuleDetail,
+  type ModuleStepId,
+} from '../types/platform2'
 import './Platform2.css'
 
 type Phase = 'intro' | 'learning' | 'complete'
@@ -30,6 +39,8 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   const [assessmentIndex, setAssessmentIndex] = useState(0)
   const [showFullData, setShowFullData] = useState(false)
   const [agentRevealed, setAgentRevealed] = useState(false)
+  const [agentRunning, setAgentRunning] = useState(false)
+  const [liveInsight, setLiveInsight] = useState<AgentInsight | null>(null)
   const [showAgentAsk, setShowAgentAsk] = useState(false)
   const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, string>>({})
   const [exerciseFeedback, setExerciseFeedback] = useState<Record<string, 'correct' | 'incorrect'>>({})
@@ -67,16 +78,45 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     setAssessmentFeedback((prev) => ({ ...prev, [q.id]: value === q.correctValue }))
   }
 
+  const insight = liveInsight ?? module.agentInsight
+
+  async function handleRunForecastAgent() {
+    setAgentRunning(true)
+    setAgentReply(null)
+    // Short delay so the demo feels like an agent run (nexos would take similar time)
+    await new Promise((r) => window.setTimeout(r, 1100))
+    const result = runForecastAgentOnPractice(
+      module.simulatedData,
+      module.externalSignals,
+      module.companyProfile.name,
+    )
+    setLiveInsight(result.insight)
+    setAgentRevealed(true)
+    setAgentRunning(false)
+  }
+
   async function handleAskAgent() {
     if (!agentQuestion.trim()) return
     setAgentLoading(true)
+    if (liveInsight) {
+      await new Promise((r) => window.setTimeout(r, 500))
+      setAgentReply({
+        content: answerForecastFollowUp(agentQuestion, liveInsight),
+        source: 'mock',
+      })
+      setAgentLoading(false)
+      return
+    }
     const context = [
       module.companyProfile.name,
-      module.agentInsight.summary,
+      insight.summary,
       module.simulatedData
         .slice(-8)
         .map((r) => `${r.period} ${r.sku}: ${r.unitsSold}`)
         .join('\n'),
+      module.externalSignals
+        ?.map((e) => `${e.period} ${e.eventName} (${e.eventType})`)
+        .join('\n') ?? '',
     ].join('\n')
     const reply = await askForecastAgent(agentQuestion, context)
     setAgentReply(reply)
@@ -120,6 +160,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     setAssessmentIndex(0)
     setShowFullData(false)
     setAgentRevealed(false)
+    setLiveInsight(null)
     setShowAgentAsk(false)
   }
 
@@ -169,8 +210,8 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
         return (
           <div className="cb-step-body">
             <p>
-              Review the simulated sales history. Look for patterns by SKU and channel before moving
-              to the guided exercise.
+              Review weekly sales <strong>and</strong> the external signals calendar. Link spikes in
+              the sales table to holidays, school terms, and promotions before the guided exercise.
             </p>
             <div className="cb-stat-row">
               <div className="cb-stat">
@@ -182,21 +223,61 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 <strong>4</strong>
               </div>
               <div className="cb-stat">
+                <span className="cb-stat-label">External signals</span>
+                <strong>{module.externalSignals?.length ?? 0}</strong>
+              </div>
+              <div className="cb-stat">
                 <span className="cb-stat-label">Highest volatility</span>
                 <strong>Plain yogurt</strong>
               </div>
             </div>
+
+            {module.externalSignals && module.externalSignals.length > 0 && (
+              <div className="cb-signals-panel">
+                <p className="cb-info-label">External signals calendar</p>
+                <p className="cb-muted">
+                  Holidays, school terms, promotions, Ramadan — the same file you can upload on the
+                  apply step (optional but recommended).
+                </p>
+                <div className="cb-table-wrap">
+                  <table className="cb-table cb-table-compact">
+                    <thead>
+                      <tr>
+                        <th>Period</th>
+                        <th>Event</th>
+                        <th>Type</th>
+                        <th>Expected impact</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {module.externalSignals.map((row) => (
+                        <tr key={`${row.period}-${row.eventName}`}>
+                          <td>{row.period}</td>
+                          <td>{row.eventName}</td>
+                          <td>
+                            <span className="cb-signal-type">{row.eventType.replace(/_/g, ' ')}</span>
+                          </td>
+                          <td>{row.expectedImpact?.replace(/_/g, ' ') ?? '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             <button
               type="button"
               className="cb-expand-btn"
               onClick={() => setShowFullData((v) => !v)}
               aria-expanded={showFullData}
             >
-              {showFullData ? 'Hide full dataset' : 'View full dataset'}
+              {showFullData ? 'Hide weekly sales table' : 'View weekly sales table'}
               <ChevronDown size={16} className={showFullData ? 'is-open' : ''} />
             </button>
             {showFullData && (
               <div className="cb-table-wrap">
+                <p className="cb-info-label">Weekly sales by SKU</p>
                 <table className="cb-table">
                   <thead>
                     <tr>
@@ -256,18 +337,62 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               <div className="cb-agent-intro">
                 <Sparkles size={28} aria-hidden />
                 <p>
-                  Run the AI forecasting agent on the simulated data to see Week 9 projections and
-                  planning recommendations.
+                  Run the forecasting agent on the practice sales table and external signals
+                  calendar. Same file-in → process → out pattern as production (nexos); this demo
+                  runs the agent locally so you can show it without an API key.
                 </p>
-                <button type="button" className="btn btn-primary" onClick={() => setAgentRevealed(true)}>
-                  Run forecast analysis
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => void handleRunForecastAgent()}
+                  disabled={agentRunning}
+                >
+                  {agentRunning ? 'Running agent…' : 'Run forecast analysis'}
                 </button>
+                {agentRunning && (
+                  <p className="cb-muted">
+                    Reading sales + external signals, linking spikes, building Week-ahead forecast…
+                  </p>
+                )}
               </div>
             ) : (
               <>
-                <p>{module.agentInsight.summary}</p>
+                <p className="cb-agent-engine">Forecast agent · local demo engine (nexos-compatible output)</p>
+                <p className="cb-info-label">{insight.headline}</p>
+                <p>{insight.summary}</p>
+                {insight.externalSignalsUsed && insight.externalSignalsUsed.length > 0 && (
+                    <div className="cb-signals-panel">
+                      <p className="cb-info-label">External signals used</p>
+                      <div className="cb-table-wrap">
+                        <table className="cb-table cb-table-compact">
+                          <thead>
+                            <tr>
+                              <th>Period</th>
+                              <th>Event</th>
+                              <th>Type</th>
+                              <th>Linked to sales</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {insight.externalSignalsUsed.map((row) => (
+                              <tr key={`${row.period}-${row.eventName}`}>
+                                <td>{row.period}</td>
+                                <td>{row.eventName}</td>
+                                <td>
+                                  <span className="cb-signal-type">
+                                    {row.eventType.replace(/_/g, ' ')}
+                                  </span>
+                                </td>
+                                <td>{row.linkedSkus}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
                 <div className="cb-forecast-grid">
-                  {module.agentInsight.forecasts.map((f) => (
+                  {insight.forecasts.map((f) => (
                     <div key={f.sku} className="cb-forecast-card">
                       <h4>{f.sku}</h4>
                       <p>
@@ -281,7 +406,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                   <div>
                     <p className="cb-info-label">Recommendations</p>
                     <ul className="cb-list">
-                      {module.agentInsight.recommendations.map((r) => (
+                      {insight.recommendations.map((r) => (
                         <li key={r}>{r}</li>
                       ))}
                     </ul>
@@ -289,7 +414,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                   <div>
                     <p className="cb-info-label">Risks to monitor</p>
                     <ul className="cb-list">
-                      {module.agentInsight.risks.map((r) => (
+                      {insight.risks.map((r) => (
                         <li key={r}>{r}</li>
                       ))}
                     </ul>
@@ -319,7 +444,14 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                     >
                       {agentLoading ? 'Thinking…' : 'Submit question'}
                     </button>
-                    {agentReply && <div className="cb-agent-reply">{agentReply.content}</div>}
+                    {agentReply && (
+                      <div className="cb-agent-reply">
+                        <span className="cb-agent-engine">
+                          {agentReply.source === 'nexos' ? 'nexos.ai' : 'Forecast agent (local)'}
+                        </span>
+                        {agentReply.content}
+                      </div>
+                    )}
                   </div>
                 )}
               </>
@@ -370,10 +502,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     return (
       <div className="cb-page cb-module-intro">
         <Link to="/pathways" className="cb-back">
-          <ArrowLeft size={16} /> Back to modules
+          <ArrowLeft size={16} /> Back to courses
         </Link>
         <div className="cb-card cb-intro-card">
-          <p className="cb-kicker">Module {module.number}</p>
+          <p className="cb-kicker">Course {module.number}</p>
           <h1>{module.title}</h1>
           <p className="cb-muted">{module.description}</p>
           <p className="cb-duration">This walkthrough: {module.duration}</p>
@@ -392,11 +524,11 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
             </ul>
           </div>
           <button type="button" className="btn btn-primary" onClick={() => setPhase('learning')}>
-            Begin module <ArrowRight size={16} />
+            Begin course <ArrowRight size={16} />
           </button>
           <p className="cb-agent-learn">
             Already have company files?{' '}
-            <Link to={`/agents/${module.id}`}>Skip the lesson and use the agent</Link>
+            <Link to={`/agents/${module.id}`}>Skip the course and use the agent</Link>
           </p>
         </div>
       </div>
@@ -408,9 +540,9 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
       <div className="cb-page cb-complete">
         <div className="cb-card cb-complete-card">
           <CheckCircle2 size={40} className="cb-complete-icon" aria-hidden />
-          <h1>Module complete</h1>
+          <h1>Course complete</h1>
           <p>
-            You practised on simulated data, then ran the forecasting agent on company files
+            You practised on sales plus external signals, then ran the forecasting agent on company files
             {companyAnalysis
               ? ` (${companyAnalysis.companyLabel}).`
               : '.'}{' '}
@@ -422,7 +554,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               Use this agent on new data
             </Link>
             <Link to="/pathways" className="btn btn-ghost">
-              Back to modules
+              Back to courses
             </Link>
             <button type="button" className="btn btn-ghost" onClick={() => {
               setPhase('intro')
@@ -431,7 +563,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               setAssessmentIndex(0)
               setCompanyAnalysis(null)
             }}>
-              Review module
+              Review course
             </button>
           </div>
         </div>
@@ -444,7 +576,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     (currentStep.id === 'assessment' && assessmentIndex < module.assessment.length - 1)
       ? 'Continue'
       : stepIndex >= MODULE_STEPS.length - 1
-        ? 'Finish module'
+        ? 'Finish course'
         : 'Continue'
 
   return (
@@ -452,9 +584,9 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
       <div className="cb-runner-shell">
         <aside className="cb-runner-side">
           <Link to="/pathways" className="cb-back">
-            <ArrowLeft size={16} /> Exit module
+            <ArrowLeft size={16} /> Exit course
           </Link>
-          <p className="cb-kicker">Module {module.number}</p>
+          <p className="cb-kicker">Course {module.number}</p>
           <h2>{module.title.replace(/^Learning to /, '')}</h2>
           <ProgressBar value={progress} label={`${Math.round(progress)}% complete`} />
           <ol className="cb-progress-steps">
