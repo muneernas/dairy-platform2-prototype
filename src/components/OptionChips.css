@@ -1,43 +1,66 @@
 .chips {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.6rem;
-  margin-top: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.35rem;
 }
 
 .chip {
   text-align: left;
   border: 1px solid var(--border);
   background: var(--surface);
-  border-radius: 0.9rem;
-  padding: 0.8rem 0.9rem;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease),
+    box-shadow var(--duration-fast) ease,
+    background var(--duration-fast) ease;
   font: inherit;
   color: inherit;
 }
 
 .chip:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  border-color: color-mix(in srgb, var(--teal-600) 45%, var(--border));
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
 .chip:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+  cursor: default;
+  opacity: 1;
+}
+
+.chip.is-selected {
+  border-color: var(--teal-600);
+  background: var(--teal-50);
+  box-shadow: 0 0 0 3px rgba(20, 122, 100, 0.12);
+}
+
+.chip.is-correct {
+  border-color: #2f9d6a;
+  background: var(--ok-bg);
+  box-shadow: 0 0 0 3px rgba(47, 157, 106, 0.12);
+}
+
+.chip.is-wrong {
+  border-color: #d97757;
+  background: #fff5f1;
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.1);
 }
 
 .chip-label {
   display: block;
   font-weight: 650;
-  font-size: 0.92rem;
+  font-size: 0.94rem;
+  letter-spacing: -0.01em;
 }
 
 .chip-desc {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 0.3rem;
   color: var(--muted);
   font-size: 0.8rem;
-  line-height: 1.35;
+  line-height: 1.4;
 }

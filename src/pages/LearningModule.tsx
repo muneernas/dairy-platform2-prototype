@@ -1,6 +1,18 @@
 import { useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, CheckCircle2, ChevronDown, Sparkles } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bot,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  Clock3,
+  MapPin,
+  Sparkles,
+  Target,
+} from 'lucide-react'
 import { OptionChips } from '../components/OptionChips'
 import { ProgressBar } from '../components/ProgressBar'
 import { CompanyApplyStep } from '../components/CompanyApplyStep'
@@ -15,6 +27,7 @@ import {
   type ModuleStepId,
 } from '../types/platform2'
 import './Platform2.css'
+import './LearningModule.css'
 
 type Phase = 'intro' | 'learning' | 'complete'
 
@@ -73,7 +86,6 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
   async function handleRunForecastAgent() {
     setAgentRunning(true)
-    // Short delay so the demo feels like an agent run (nexos would take similar time)
     await new Promise((r) => window.setTimeout(r, 1100))
     const result = runForecastAgentOnPractice(
       module.simulatedData,
@@ -133,17 +145,13 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   }
 
   function goNextStep() {
-    if (currentStep.id === 'exercise') {
-      if (exerciseIndex < module.exercises.length - 1) {
-        setExerciseIndex((i) => i + 1)
-        return
-      }
+    if (currentStep.id === 'exercise' && exerciseIndex < module.exercises.length - 1) {
+      setExerciseIndex((i) => i + 1)
+      return
     }
-    if (currentStep.id === 'assessment') {
-      if (assessmentIndex < module.assessment.length - 1) {
-        setAssessmentIndex((i) => i + 1)
-        return
-      }
+    if (currentStep.id === 'assessment' && assessmentIndex < module.assessment.length - 1) {
+      setAssessmentIndex((i) => i + 1)
+      return
     }
     if (stepIndex >= MODULE_STEPS.length - 1) {
       setPhase('complete')
@@ -180,20 +188,25 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     switch (stepId) {
       case 'objectives':
         return (
-          <div className="cb-step-body">
-            <p>
-              By the end of this module, your team will be able to use an AI forecasting agent to
-              support production planning and reduce waste or stockouts.
+          <div className="lm-body">
+            <p className="lm-lead">
+              By the end of this course, your team will use an AI forecasting agent to support
+              production planning and reduce waste or stockouts.
             </p>
-            <ul className="cb-objectives">
+            <ul className="lm-obj-grid">
               {module.learningObjectives.map((obj) => (
-                <li key={obj}>{obj}</li>
+                <li key={obj}>
+                  <Target size={16} aria-hidden />
+                  <span>{obj}</span>
+                </li>
               ))}
             </ul>
-            <div className="cb-info-box">
-              <p className="cb-info-label">Training case</p>
+            <div className="lm-case">
+              <p className="lm-info-label">Training case</p>
               <h3>{module.companyProfile.name}</h3>
-              <p>{module.companyProfile.type} · {module.companyProfile.location}</p>
+              <p>
+                {module.companyProfile.type} · {module.companyProfile.location}
+              </p>
               <p className="cb-muted">{module.companyProfile.note}</p>
             </div>
           </div>
@@ -201,36 +214,36 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
       case 'simulated-data':
         return (
-          <div className="cb-step-body">
-            <p>
+          <div className="lm-body">
+            <p className="lm-lead">
               Review weekly sales <strong>and</strong> the external signals calendar. Link spikes in
               the sales table to holidays, school terms, and promotions before the guided exercise.
             </p>
-            <div className="cb-stat-row">
-              <div className="cb-stat">
-                <span className="cb-stat-label">Weeks of data</span>
+            <div className="lm-stats">
+              <div className="lm-stat">
+                <span>Weeks</span>
                 <strong>8</strong>
               </div>
-              <div className="cb-stat">
-                <span className="cb-stat-label">SKUs</span>
+              <div className="lm-stat">
+                <span>SKUs</span>
                 <strong>4</strong>
               </div>
-              <div className="cb-stat">
-                <span className="cb-stat-label">External signals</span>
+              <div className="lm-stat">
+                <span>Signals</span>
                 <strong>{module.externalSignals?.length ?? 0}</strong>
               </div>
-              <div className="cb-stat">
-                <span className="cb-stat-label">Highest volatility</span>
-                <strong>Plain yogurt</strong>
+              <div className="lm-stat">
+                <span>Highest volatility</span>
+                <strong>Yogurt</strong>
               </div>
             </div>
 
             {module.externalSignals && module.externalSignals.length > 0 && (
-              <div className="cb-signals-panel">
-                <p className="cb-info-label">External signals calendar</p>
+              <div className="lm-panel-block">
+                <h3>External signals calendar</h3>
                 <p className="cb-muted">
-                  Holidays, school terms, promotions, Ramadan — the same file you can upload on the
-                  apply step (optional but recommended).
+                  Holidays, school terms, promotions, Ramadan — the same optional file you can upload
+                  later.
                 </p>
                 <div className="cb-table-wrap">
                   <table className="cb-table cb-table-compact">
@@ -270,7 +283,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
             </button>
             {showFullData && (
               <div className="cb-table-wrap">
-                <p className="cb-info-label">Weekly sales by SKU</p>
+                <p className="lm-info-label">Weekly sales by SKU</p>
                 <table className="cb-table">
                   <thead>
                     <tr>
@@ -300,20 +313,23 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
       case 'exercise':
         return (
-          <div className="cb-step-body">
-            <p className="cb-step-counter">
+          <div className="lm-body">
+            <p className="lm-q-meta">
               Question {exerciseIndex + 1} of {module.exercises.length}
             </p>
-            <h3 className="cb-step-question">{currentExercise.prompt}</h3>
+            <h3 className="lm-question">{currentExercise.prompt}</h3>
             {currentExercise.context && <p className="cb-muted">{currentExercise.context}</p>}
             <OptionChips
               options={currentExercise.options}
               onSelect={handleExerciseSelect}
               disabled={Boolean(exerciseAnswers[currentExercise.id])}
+              selectedValue={exerciseAnswers[currentExercise.id]}
+              correctValue={currentExercise.correctValue}
+              revealed={Boolean(exerciseFeedback[currentExercise.id])}
             />
             {exerciseFeedback[currentExercise.id] && (
               <div
-                className={`cb-feedback ${exerciseFeedback[currentExercise.id] === 'correct' ? 'ok' : 'warn'}`}
+                className={`lm-feedback ${exerciseFeedback[currentExercise.id] === 'correct' ? 'ok' : 'warn'}`}
               >
                 {exerciseFeedback[currentExercise.id] === 'correct'
                   ? currentExercise.feedback.correct
@@ -325,18 +341,19 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
       case 'agent-analysis':
         return (
-          <div className="cb-step-body">
+          <div className="lm-body">
             {!agentRevealed ? (
-              <div className="cb-agent-intro">
-                <Sparkles size={28} aria-hidden />
+              <div className="lm-agent-launch">
+                <div className="lm-agent-launch-icon" aria-hidden>
+                  <Sparkles size={22} />
+                </div>
                 <p>
-                  Run the forecasting agent on the practice sales table and external signals
-                  calendar. Same file-in → process → out pattern as production (nexos); this demo
-                  runs the agent locally so you can show it without an API key.
+                  Run the forecasting agent on the practice sales table and external signals. Same
+                  file-in → insights-out pattern as production — then chat about the results.
                 </p>
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-lg"
                   onClick={() => void handleRunForecastAgent()}
                   disabled={agentRunning}
                 >
@@ -344,49 +361,50 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 </button>
                 {agentRunning && (
                   <p className="cb-muted">
-                    Reading sales + external signals, linking spikes, building Week-ahead forecast…
+                    Reading sales + signals, linking spikes, building next-week forecast…
                   </p>
                 )}
               </div>
             ) : (
               <>
                 <p className="cb-agent-engine">
-                  Forecast agent · local analysis engine · chat uses nexos-style instructions + knowledge
-                  base (free LLM when configured)
+                  Forecast agent · practice run · chat uses live LLM + knowledge base when configured
                 </p>
-                <p className="cb-info-label">{insight.headline}</p>
-                <p>{insight.summary}</p>
+                <div className="lm-case">
+                  <p className="lm-info-label">{insight.headline}</p>
+                  <p>{insight.summary}</p>
+                </div>
                 {insight.externalSignalsUsed && insight.externalSignalsUsed.length > 0 && (
-                    <div className="cb-signals-panel">
-                      <p className="cb-info-label">External signals used</p>
-                      <div className="cb-table-wrap">
-                        <table className="cb-table cb-table-compact">
-                          <thead>
-                            <tr>
-                              <th>Period</th>
-                              <th>Event</th>
-                              <th>Type</th>
-                              <th>Linked to sales</th>
+                  <div className="lm-panel-block">
+                    <h3>External signals used</h3>
+                    <div className="cb-table-wrap">
+                      <table className="cb-table cb-table-compact">
+                        <thead>
+                          <tr>
+                            <th>Period</th>
+                            <th>Event</th>
+                            <th>Type</th>
+                            <th>Linked to sales</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {insight.externalSignalsUsed.map((row) => (
+                            <tr key={`${row.period}-${row.eventName}`}>
+                              <td>{row.period}</td>
+                              <td>{row.eventName}</td>
+                              <td>
+                                <span className="cb-signal-type">
+                                  {row.eventType.replace(/_/g, ' ')}
+                                </span>
+                              </td>
+                              <td>{row.linkedSkus}</td>
                             </tr>
-                          </thead>
-                          <tbody>
-                            {insight.externalSignalsUsed.map((row) => (
-                              <tr key={`${row.period}-${row.eventName}`}>
-                                <td>{row.period}</td>
-                                <td>{row.eventName}</td>
-                                <td>
-                                  <span className="cb-signal-type">
-                                    {row.eventType.replace(/_/g, ' ')}
-                                  </span>
-                                </td>
-                                <td>{row.linkedSkus}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  )}
+                  </div>
+                )}
                 <div className="cb-forecast-grid">
                   {insight.forecasts.map((f) => (
                     <div key={f.sku} className="cb-forecast-card">
@@ -400,7 +418,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 </div>
                 <div className="cb-split">
                   <div>
-                    <p className="cb-info-label">Recommendations</p>
+                    <p className="lm-info-label">Recommendations</p>
                     <ul className="cb-list">
                       {insight.recommendations.map((r) => (
                         <li key={r}>{r}</li>
@@ -408,7 +426,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                     </ul>
                   </div>
                   <div>
-                    <p className="cb-info-label">Risks to monitor</p>
+                    <p className="lm-info-label">Risks to monitor</p>
                     <ul className="cb-list">
                       {insight.risks.map((r) => (
                         <li key={r}>{r}</li>
@@ -424,25 +442,30 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
       case 'assessment':
         return (
-          <div className="cb-step-body">
-            <p className="cb-step-counter">
+          <div className="lm-body">
+            <p className="lm-q-meta">
               Question {assessmentIndex + 1} of {module.assessment.length}
             </p>
-            <h3 className="cb-step-question">{currentAssessment.prompt}</h3>
+            <h3 className="lm-question">{currentAssessment.prompt}</h3>
             <OptionChips
               options={currentAssessment.options}
               onSelect={handleAssessmentSelect}
               disabled={Boolean(assessmentAnswers[currentAssessment.id])}
+              selectedValue={assessmentAnswers[currentAssessment.id]}
+              correctValue={currentAssessment.correctValue}
+              revealed={assessmentFeedback[currentAssessment.id] !== undefined}
             />
             {assessmentFeedback[currentAssessment.id] !== undefined && (
-              <div className={`cb-feedback ${assessmentFeedback[currentAssessment.id] ? 'ok' : 'warn'}`}>
+              <div
+                className={`lm-feedback ${assessmentFeedback[currentAssessment.id] ? 'ok' : 'warn'}`}
+              >
                 {assessmentFeedback[currentAssessment.id]
                   ? `Correct. ${currentAssessment.ragExplanation}`
                   : `Review: ${currentAssessment.ragExplanation}`}
               </div>
             )}
             {assessmentComplete && assessmentIndex === module.assessment.length - 1 && (
-              <p className="cb-score">Score: {assessmentScore}%</p>
+              <p className="lm-score-pill">Score: {assessmentScore}%</p>
             )}
           </div>
         )
@@ -463,36 +486,72 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
   if (phase === 'intro') {
     return (
-      <div className="cb-page cb-module-intro">
-        <Link to="/pathways" className="cb-back">
+      <div className="lm lm-intro">
+        <Link to="/pathways" className="lm-back">
           <ArrowLeft size={16} /> Back to courses
         </Link>
-        <div className="cb-card cb-intro-card">
-          <p className="cb-kicker">Course {module.number}</p>
-          <h1>{module.title}</h1>
-          <p className="cb-muted">{module.description}</p>
-          <p className="cb-duration">This walkthrough: {module.duration}</p>
-          {module.fullDuration && (
-            <p className="cb-muted">
-              The complete self-paced module — with your own data, fuller exercises, and an action
-              plan — is typically {module.fullDuration}.
-            </p>
-          )}
-          <div className="cb-intro-objectives">
-            <p className="cb-info-label">You will learn to</p>
-            <ul>
-              {module.learningObjectives.slice(0, 3).map((obj) => (
-                <li key={obj}>{obj}</li>
+
+        <motion.section
+          className="lm-intro-hero"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div>
+            <p className="lm-eyebrow">Course {module.number}</p>
+            <h1>{module.title}</h1>
+            <p className="lm-intro-desc">{module.description}</p>
+            <div className="lm-meta-row">
+              <span className="lm-meta-pill">
+                <Clock3 size={14} /> Demo: {module.duration}
+              </span>
+              {module.fullDuration && (
+                <span className="lm-meta-pill">
+                  <Target size={14} /> Full course: {module.fullDuration}
+                </span>
+              )}
+              <span className="lm-meta-pill">
+                <MapPin size={14} /> {module.companyProfile.location}
+              </span>
+            </div>
+            <div className="lm-intro-actions">
+              <button
+                type="button"
+                className="btn btn-primary btn-lg"
+                onClick={() => setPhase('learning')}
+              >
+                Begin course <ArrowRight size={18} />
+              </button>
+              <Link to={`/agents/${module.id}`} className="lm-skip">
+                Skip to agent with company files →
+              </Link>
+            </div>
+          </div>
+        </motion.section>
+
+        <div className="lm-intro-panels">
+          <div className="lm-panel">
+            <h2>You will learn to</h2>
+            <ul className="lm-obj-list">
+              {module.learningObjectives.slice(0, 4).map((obj) => (
+                <li key={obj}>
+                  <CheckCircle2 size={16} aria-hidden />
+                  <span>{obj}</span>
+                </li>
               ))}
             </ul>
           </div>
-          <button type="button" className="btn btn-primary" onClick={() => setPhase('learning')}>
-            Begin course <ArrowRight size={16} />
-          </button>
-          <p className="cb-agent-learn">
-            Already have company files?{' '}
-            <Link to={`/agents/${module.id}`}>Skip the course and use the agent</Link>
-          </p>
+          <div className="lm-panel">
+            <h2>Course path</h2>
+            <ol className="lm-path">
+              {MODULE_STEPS.map((step, i) => (
+                <li key={step.id}>
+                  <span className="lm-path-num">{i + 1}</span>
+                  {step.label}
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </div>
     )
@@ -500,36 +559,46 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
   if (phase === 'complete') {
     return (
-      <div className="cb-page cb-complete">
-        <div className="cb-card cb-complete-card">
-          <CheckCircle2 size={40} className="cb-complete-icon" aria-hidden />
+      <div className="lm">
+        <motion.div
+          className="lm-complete"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35 }}
+        >
+          <div className="lm-complete-icon" aria-hidden>
+            <CheckCircle2 size={28} />
+          </div>
           <h1>Course complete</h1>
           <p>
-            You practised on sales plus external signals, then ran the forecasting agent on company files
-            {companyAnalysis
-              ? ` (${companyAnalysis.companyLabel}).`
-              : '.'}{' '}
-            Use the same export-and-review loop each week before locking production.
+            You practised on sales plus external signals, then ran the forecasting agent on company
+            files
+            {companyAnalysis ? ` (${companyAnalysis.companyLabel})` : ''}. Use the same
+            export-and-review loop each week before locking production.
           </p>
-          <p className="cb-score">Knowledge check: {assessmentScore}%</p>
-          <div className="cb-complete-actions">
+          <p className="lm-score-pill">Knowledge check: {assessmentScore}%</p>
+          <div className="lm-complete-actions">
             <Link to={`/agents/${module.id}`} className="btn btn-primary">
-              Use this agent on new data
+              <Bot size={16} /> Use this agent on new data
             </Link>
-            <Link to="/pathways" className="btn btn-ghost">
+            <Link to="/pathways" className="btn btn-secondary">
               Back to courses
             </Link>
-            <button type="button" className="btn btn-ghost" onClick={() => {
-              setPhase('intro')
-              setStepIndex(0)
-              setExerciseIndex(0)
-              setAssessmentIndex(0)
-              setCompanyAnalysis(null)
-            }}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                setPhase('intro')
+                setStepIndex(0)
+                setExerciseIndex(0)
+                setAssessmentIndex(0)
+                setCompanyAnalysis(null)
+              }}
+            >
               Review course
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     )
   }
@@ -543,38 +612,52 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
         : 'Continue'
 
   return (
-    <div className="cb-page cb-runner">
-      <div className="cb-runner-shell">
-        <aside className="cb-runner-side">
-          <Link to="/pathways" className="cb-back">
+    <div className="lm">
+      <div className="lm-runner">
+        <aside className="lm-side">
+          <Link to="/pathways" className="lm-back">
             <ArrowLeft size={16} /> Exit course
           </Link>
-          <p className="cb-kicker">Course {module.number}</p>
+          <p className="lm-side-kicker">Course {module.number}</p>
           <h2>{module.title.replace(/^Learning to /, '')}</h2>
           <ProgressBar value={progress} label={`${Math.round(progress)}% complete`} />
-          <ol className="cb-progress-steps">
-            {MODULE_STEPS.map((step, idx) => (
-              <li
-                key={step.id}
-                className={
-                  idx < stepIndex ? 'done' : idx === stepIndex ? 'current' : undefined
-                }
-              >
-                {step.label}
-              </li>
-            ))}
+          <ol className="lm-steps">
+            {MODULE_STEPS.map((step, idx) => {
+              const state = idx < stepIndex ? 'done' : idx === stepIndex ? 'current' : undefined
+              return (
+                <li key={step.id} className={state}>
+                  <span className="lm-step-dot" aria-hidden>
+                    {idx < stepIndex ? <Check size={12} strokeWidth={3} /> : idx + 1}
+                  </span>
+                  <span>{step.label}</span>
+                </li>
+              )
+            })}
           </ol>
         </aside>
 
-        <section className="cb-card cb-runner-main">
-          <p className="cb-kicker">
-            Step {stepIndex + 1} of {MODULE_STEPS.length}
-          </p>
-          <h1>{currentStep.label}</h1>
-          <p className="cb-muted">{currentStep.description}</p>
-          {renderStep(currentStep.id)}
+        <section className="lm-main">
+          <div className="lm-main-head">
+            <p className="lm-eyebrow">
+              Step {stepIndex + 1} of {MODULE_STEPS.length}
+            </p>
+            <h1>{currentStep.label}</h1>
+            <p>{currentStep.description}</p>
+          </div>
 
-          <div className="cb-runner-nav">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${currentStep.id}-${exerciseIndex}-${assessmentIndex}-${agentRevealed}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22 }}
+            >
+              {renderStep(currentStep.id)}
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="lm-nav">
             <button type="button" className="btn btn-ghost" onClick={goPrevStep}>
               <ArrowLeft size={16} /> Back
             </button>
