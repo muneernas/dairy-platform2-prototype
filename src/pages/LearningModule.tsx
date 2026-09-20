@@ -48,9 +48,11 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   const [assessmentFeedback, setAssessmentFeedback] = useState<Record<string, boolean>>({})
   const [companyAnalysis, setCompanyAnalysis] = useState<CompanyAnalysis | null>(null)
   const [agentQuestion, setAgentQuestion] = useState('')
-  const [agentReply, setAgentReply] = useState<{ content: string; source: 'nexos' | 'mock' } | null>(
-    null,
-  )
+  const [agentReply, setAgentReply] = useState<{
+    content: string
+    source: 'nexos' | 'stand-in' | 'mock'
+    knowledgeUsed?: string[]
+  } | null>(null)
   const [agentLoading, setAgentLoading] = useState(false)
 
   const currentStep = MODULE_STEPS[stepIndex]
@@ -98,28 +100,49 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   async function handleAskAgent() {
     if (!agentQuestion.trim()) return
     setAgentLoading(true)
-    if (liveInsight) {
-      await new Promise((r) => window.setTimeout(r, 500))
+    const context = [
+      `Company: ${module.companyProfile.name}`,
+      `Headline: ${insight.headline}`,
+      `Summary: ${insight.summary}`,
+      insight.forecasts?.length
+        ? `Forecasts:\n${insight.forecasts
+            .map((f) => `- ${f.sku}: ${f.forecastUnits} (${f.trend}) for ${f.nextPeriod}`)
+            .join('\n')}`
+        : '',
+      insight.recommendations?.length
+        ? `Recommendations: ${insight.recommendations.join('; ')}`
+        : '',
+      insight.risks?.length ? `Risks: ${insight.risks.join('; ')}` : '',
+      insight.externalSignalsUsed?.length
+        ? `Signals used:\n${insight.externalSignalsUsed
+            .map((s) => `- ${s.period} ${s.eventName} → ${s.linkedSkus}`)
+            .join('\n')}`
+        : '',
+      'Recent sales rows:',
+      module.simulatedData
+        .slice(-8)
+        .map((r) => `${r.period} ${r.sku}: ${r.unitsSold} (${r.channel})`)
+        .join('\n'),
+      module.externalSignals?.length
+        ? `External signals calendar:\n${module.externalSignals
+            .map((e) => `${e.period} ${e.eventName} (${e.eventType})`)
+            .join('\n')}`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('\n')
+
+    const reply = await askForecastAgent(agentQuestion, context)
+    // If LLM/nexos unavailable, enrich offline answer with local follow-up when we have a live run
+    if (reply.source === 'mock' && liveInsight) {
       setAgentReply({
         content: answerForecastFollowUp(agentQuestion, liveInsight),
         source: 'mock',
+        knowledgeUsed: reply.knowledgeUsed,
       })
-      setAgentLoading(false)
-      return
+    } else {
+      setAgentReply(reply)
     }
-    const context = [
-      module.companyProfile.name,
-      insight.summary,
-      module.simulatedData
-        .slice(-8)
-        .map((r) => `${r.period} ${r.sku}: ${r.unitsSold}`)
-        .join('\n'),
-      module.externalSignals
-        ?.map((e) => `${e.period} ${e.eventName} (${e.eventType})`)
-        .join('\n') ?? '',
-    ].join('\n')
-    const reply = await askForecastAgent(agentQuestion, context)
-    setAgentReply(reply)
     setAgentLoading(false)
   }
 
@@ -357,7 +380,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               </div>
             ) : (
               <>
-                <p className="cb-agent-engine">Forecast agent · local demo engine (nexos-compatible output)</p>
+                <p className="cb-agent-engine">
+                  Forecast agent · local analysis engine · chat uses nexos-style instructions + knowledge
+                  base (free LLM when configured)
+                </p>
                 <p className="cb-info-label">{insight.headline}</p>
                 <p>{insight.summary}</p>
                 {insight.externalSignalsUsed && insight.externalSignalsUsed.length > 0 && (
@@ -447,9 +473,18 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                     {agentReply && (
                       <div className="cb-agent-reply">
                         <span className="cb-agent-engine">
-                          {agentReply.source === 'nexos' ? 'nexos.ai' : 'Forecast agent (local)'}
+                          {agentReply.source === 'nexos'
+                            ? 'nexos.ai'
+                            : agentReply.source === 'stand-in'
+                              ? 'nexos-style stand-in (free LLM + knowledge base)'
+                              : 'Offline stand-in (knowledge base heuristics)'}
                         </span>
                         {agentReply.content}
+                        {agentReply.knowledgeUsed && agentReply.knowledgeUsed.length > 0 && (
+                          <p className="cb-kb-used">
+                            Knowledge used: {agentReply.knowledgeUsed.join(' · ')}
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>

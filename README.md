@@ -20,7 +20,10 @@ npm install
 npm run dev
 ```
 
-Optional: copy `.env.example` to `.env` and set `VITE_NEXOS_API_KEY` for live agent answers.
+Optional: copy `.env.example` to `.env` and set either:
+
+- `VITE_NEXOS_API_KEY` for real nexos Gateway, or
+- `VITE_LLM_API_KEY` for a **free LLM stand-in** (Groq recommended) that uses the same instructions + knowledge-base pattern as a nexos agent.
 
 ## Deploy
 
