@@ -11,6 +11,8 @@ export interface AgentChatReply {
   content: string
   source: AgentReplySource
   knowledgeUsed: string[]
+  /** Set when live LLM was configured but failed, so the UI can explain the fallback */
+  fallbackReason?: string
 }
 
 /** Same four parts you would configure on nexos → Agents → Instructions */
@@ -52,30 +54,53 @@ async function callOpenAiCompatible(opts: {
   model: string
   system: string
   user: string
-}): Promise<string | null> {
+}): Promise<{ text: string | null; error?: string }> {
   const base = opts.baseUrl.replace(/\/$/, '')
-  const res = await fetch(`${base}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${opts.apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: opts.model,
-      messages: [
-        { role: 'system', content: opts.system },
-        { role: 'user', content: opts.user },
-      ],
-      max_tokens: 450,
-      temperature: 0.3,
-    }),
-  })
-
-  if (!res.ok) return null
-  const data = (await res.json()) as {
-    choices?: { message?: { content?: string } }[]
+  let res: Response
+  try {
+    res = await fetch(`${base}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${opts.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: opts.model,
+        messages: [
+          { role: 'system', content: opts.system },
+          { role: 'user', content: opts.user },
+        ],
+        max_tokens: 800,
+        temperature: 0.3,
+      }),
+    })
+  } catch (err) {
+    return { text: null, error: err instanceof Error ? err.message : 'Network error calling LLM' }
   }
-  return data.choices?.[0]?.message?.content?.trim() || null
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '')
+    return {
+      text: null,
+      error: `LLM HTTP ${res.status}${detail ? `: ${detail.slice(0, 180)}` : ''}`,
+    }
+  }
+
+  const data = (await res.json()) as {
+    choices?: { message?: { content?: string; reasoning?: string } }[]
+  }
+  const message = data.choices?.[0]?.message
+  const content = message?.content?.trim()
+  if (content) return { text: content }
+
+  // Some Groq "oss" models fill reasoning first; content can be empty if max_tokens is tight
+  const reasoning = message?.reasoning?.trim()
+  if (reasoning) {
+    const trimmed = reasoning.replace(/^[\s\S]*?(?=\n\n|[A-Z])/u, '').trim()
+    return { text: trimmed || reasoning.slice(0, 500) }
+  }
+
+  return { text: null, error: 'LLM returned an empty message' }
 }
 
 /**
@@ -95,36 +120,33 @@ export async function askNexosStyleForecastAgent(
 
   const nexosKey = (import.meta.env.VITE_NEXOS_API_KEY as string | undefined)?.trim()
   if (nexosKey) {
-    try {
-      const text = await callOpenAiCompatible({
-        baseUrl: 'https://api.nexos.ai/v1',
-        apiKey: nexosKey,
-        model: (import.meta.env.VITE_NEXOS_MODEL as string | undefined) ?? 'GPT 5 mini',
-        system,
-        user,
-      })
-      if (text) return { content: text, source: 'nexos', knowledgeUsed }
-    } catch {
-      // fall through
-    }
+    const result = await callOpenAiCompatible({
+      baseUrl: 'https://api.nexos.ai/v1',
+      apiKey: nexosKey,
+      model: (import.meta.env.VITE_NEXOS_MODEL as string | undefined) ?? 'GPT 5 mini',
+      system,
+      user,
+    })
+    if (result.text) return { content: result.text, source: 'nexos', knowledgeUsed }
   }
 
   const llmKey = (import.meta.env.VITE_LLM_API_KEY as string | undefined)?.trim()
   if (llmKey) {
-    try {
-      const text = await callOpenAiCompatible({
-        baseUrl:
-          (import.meta.env.VITE_LLM_BASE_URL as string | undefined) ??
-          'https://api.groq.com/openai/v1',
-        apiKey: llmKey,
-        model:
-          (import.meta.env.VITE_LLM_MODEL as string | undefined) ?? 'openai/gpt-oss-20b',
-        system,
-        user,
-      })
-      if (text) return { content: text, source: 'stand-in', knowledgeUsed }
-    } catch {
-      // fall through
+    const result = await callOpenAiCompatible({
+      baseUrl:
+        (import.meta.env.VITE_LLM_BASE_URL as string | undefined) ??
+        'https://api.groq.com/openai/v1',
+      apiKey: llmKey,
+      model: (import.meta.env.VITE_LLM_MODEL as string | undefined) ?? 'qwen/qwen3.8-27b',
+      system,
+      user,
+    })
+    if (result.text) return { content: result.text, source: 'stand-in', knowledgeUsed }
+    return {
+      content: offlineForecastAnswer(userQuestion, knowledge),
+      source: 'mock',
+      knowledgeUsed,
+      fallbackReason: result.error ?? 'Live LLM returned no text',
     }
   }
 
@@ -132,6 +154,8 @@ export async function askNexosStyleForecastAgent(
     content: offlineForecastAnswer(userQuestion, knowledge),
     source: 'mock',
     knowledgeUsed,
+    fallbackReason:
+      'No VITE_LLM_API_KEY in this build (GitHub Pages has no key — use npm run dev locally)',
   }
 }
 

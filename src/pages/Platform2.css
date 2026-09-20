@@ -757,6 +757,10 @@
   line-height: 1.35;
 }
 
+.cb-llm-fallback {
+  margin: 0 0 0.65rem;
+}
+
 .cb-score {
   font-weight: 700;
   color: var(--accent-ink);

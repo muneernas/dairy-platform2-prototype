@@ -17,6 +17,7 @@ export function AgentFollowUpChat({
     content: string
     source: 'nexos' | 'stand-in' | 'mock'
     knowledgeUsed?: string[]
+    fallbackReason?: string
   } | null>(null)
 
   async function handleAsk() {
@@ -61,6 +62,9 @@ export function AgentFollowUpChat({
                 ? 'nexos-style stand-in (free LLM + knowledge base)'
                 : 'Offline stand-in (knowledge base heuristics)'}
           </span>
+          {reply.fallbackReason && (
+            <p className="cb-feedback warn cb-llm-fallback">{reply.fallbackReason}</p>
+          )}
           {reply.content}
           {reply.knowledgeUsed && reply.knowledgeUsed.length > 0 && (
             <p className="cb-kb-used">Knowledge used: {reply.knowledgeUsed.join(' · ')}</p>
