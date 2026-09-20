@@ -36,7 +36,7 @@ export function AgentFollowUpChat({
       id: 'welcome',
       role: 'assistant',
       content:
-        'Ask about this forecast run — yogurt volatility, signals, waste risk, or next steps.',
+        'I’ve analysed this run. Ask me anything about the forecast, external signals, risks, or what to do next — I’ll reply in this chat.',
       source: 'stand-in',
     },
   ])
@@ -95,9 +95,9 @@ export function AgentFollowUpChat({
       <div className="cb-chat-head">
         <Sparkles size={18} aria-hidden />
         <div>
-          <p className="cb-info-label">Ask about this run</p>
+          <p className="cb-info-label">Chat with the forecast agent</p>
           <p className="cb-muted cb-ask-hint">
-            Follow-up questions stay grounded in the data and knowledge base above.
+            Multi-turn Q&amp;A on this run — same pattern as a nexos agent follow-up.
           </p>
         </div>
       </div>

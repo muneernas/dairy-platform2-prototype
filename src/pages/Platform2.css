@@ -27,10 +27,11 @@
 
 .cb-page-head h1 {
   margin: 0;
-  font-weight: 650;
-  font-size: clamp(1.6rem, 3vw, 2rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 3.5vw, 2.45rem);
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--navy-900);
 }
 
@@ -123,8 +124,9 @@
 
 .cb-agent-title {
   margin: 0.35rem 0 0.5rem;
-  font-weight: 650;
-  font-size: clamp(1.4rem, 3vw, 1.75rem);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
   letter-spacing: -0.02em;
   color: var(--navy-900);
 }
@@ -639,10 +641,10 @@
   display: grid;
   gap: 0.75rem;
   justify-items: start;
-  padding: 1.1rem;
-  border-radius: 10px;
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
+  padding: 1.2rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--teal-50), #fff);
+  border: 1px solid var(--teal-100);
 }
 
 .cb-trend {
@@ -717,10 +719,10 @@
 .cb-chat {
   margin-top: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: #fff;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #f7faf9 0%, #fff 28%);
   display: grid;
-  grid-template-rows: auto minmax(200px, 300px) auto auto;
+  grid-template-rows: auto minmax(220px, 340px) auto auto;
   overflow: hidden;
 }
 
@@ -747,8 +749,8 @@
   padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  background: var(--surface-soft);
+  gap: 0.7rem;
+  background: #f3f6f5;
 }
 
 .cb-chat-bubble {
@@ -787,7 +789,7 @@
 }
 
 .cb-chat-user .cb-chat-text {
-  background: var(--navy-800);
+  background: var(--accent, #1f6b5c);
   color: #fff;
   border-bottom-right-radius: 4px;
 }

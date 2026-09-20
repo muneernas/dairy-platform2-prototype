@@ -9,17 +9,20 @@
 }
 
 .catalog-eyebrow {
-  margin: 0 0 0.4rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--teal-700);
 }
 
 .catalog-hero h1 {
-  margin: 0 0 0.65rem;
-  font-weight: 650;
-  font-size: clamp(1.6rem, 3vw, 2.1rem);
-  line-height: 1.2;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.12;
   letter-spacing: -0.02em;
   color: var(--navy-900);
 }
@@ -32,21 +35,27 @@
 }
 
 .agent-strip {
-  margin-top: 1rem;
-  display: flex;
+  margin-top: 1.25rem;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem 0.5rem;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 500;
+  gap: 0.45rem 0.55rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 999px;
+  background: var(--navy-900);
+  color: #d7e2ee;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.agent-strip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .agent-strip-sep {
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .catalog-toolbar {
@@ -112,8 +121,9 @@
 }
 
 .catalog-card.is-live:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-3px);
+  border-color: rgba(20, 122, 100, 0.35);
+  box-shadow: var(--shadow-md);
 }
 
 .catalog-card.is-locked {
@@ -138,25 +148,24 @@
 
 .catalog-badge {
   display: inline-flex;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0;
-  border: 0;
-  background: none;
-  letter-spacing: normal;
-  text-transform: none;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .catalog-badge.live {
+  background: var(--ok-bg);
   color: var(--teal-700);
-  background: none;
-  border: 0;
+  border: 1px solid var(--ok-border);
 }
 
 .catalog-badge.soon {
+  background: var(--surface-muted);
   color: var(--muted);
-  background: none;
-  border: 0;
+  border: 1px solid var(--border);
 }
 
 .catalog-card h2 {
