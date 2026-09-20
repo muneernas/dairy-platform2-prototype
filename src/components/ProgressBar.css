@@ -1,26 +1,27 @@
 .progress {
-  margin: 0.75rem 0 1rem;
+  margin: 0.75rem 0 1.15rem;
 }
 
 .progress-label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: var(--muted);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
 }
 
 .progress-track {
-  height: 0.55rem;
+  height: 0.45rem;
   border-radius: 999px;
-  background: var(--surface-2);
+  background: var(--surface-muted);
   overflow: hidden;
   border: 1px solid var(--border);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(90deg, var(--teal-500), var(--teal-700));
   border-radius: inherit;
-  transition: width 0.25s ease;
+  transition: width var(--duration) var(--ease);
 }

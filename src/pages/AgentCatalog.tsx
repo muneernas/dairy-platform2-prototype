@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Lock } from 'lucide-react'
+import { motion } from 'motion/react'
+import { ArrowRight, Bot, FileSpreadsheet, Lock, Sparkles } from 'lucide-react'
 import { AGENT_CATALOG } from '../data/agents'
-import './Platform2.css'
+import './Catalog.css'
 
 type Filter = 'all' | 'available' | 'upcoming'
 
@@ -16,17 +17,30 @@ export function AgentCatalog() {
   })
 
   return (
-    <div className="cb-page">
-      <header className="cb-page-head">
-        <p className="cb-kicker">Operational agents</p>
-        <h1>Use an agent on your data</h1>
-        <p>
-          Skip the lesson if you already have company files. Choose an agent, upload a CSV, and run
-          the analysis. Learning modules stay available if you want the teaching path first.
+    <div className="catalog">
+      <header className="catalog-hero catalog-hero-agent">
+        <p className="catalog-eyebrow">AI agents</p>
+        <h1>Run an agent on your company data</h1>
+        <p className="catalog-lede">
+          Upload a CSV export, get structured recommendations, and chat about the results. No
+          lesson required — learning modules stay available if you want the teaching path first.
         </p>
+        <div className="agent-strip" aria-hidden>
+          <span>
+            <FileSpreadsheet size={15} /> CSV in
+          </span>
+          <span className="agent-strip-sep">→</span>
+          <span>
+            <Bot size={15} /> Specialist agent
+          </span>
+          <span className="agent-strip-sep">→</span>
+          <span>
+            <Sparkles size={15} /> Insights + chat
+          </span>
+        </div>
       </header>
 
-      <div className="cb-filters" role="tablist" aria-label="Agent filters">
+      <div className="catalog-toolbar" role="tablist" aria-label="Agent filters">
         {(
           [
             ['all', 'All agents'],
@@ -39,7 +53,7 @@ export function AgentCatalog() {
             type="button"
             role="tab"
             aria-selected={filter === id}
-            className={`cb-filter ${filter === id ? 'is-active' : ''}`}
+            className={`catalog-tab${filter === id ? ' is-active' : ''}`}
             onClick={() => setFilter(id)}
           >
             {label}
@@ -47,44 +61,63 @@ export function AgentCatalog() {
         ))}
       </div>
 
-      <ul className="cb-module-list">
-        {agents.map((agent) => {
-          const available = agent.status === 'pilot'
-          const item = (
-            <>
-              <div className="cb-module-list-top">
-                <span className="cb-module-num">Agent {agent.number}</span>
-                <span className={`cb-badge ${agent.status}`}>
-                  {available ? 'Available' : 'After consultation'}
-                </span>
-              </div>
-              <h2>{agent.name}</h2>
-              <p>{agent.purpose}</p>
-              {available ? (
-                <span className="cb-module-action">
-                  Open agent <ArrowRight size={16} />
-                </span>
-              ) : (
-                <span className="cb-module-locked">
-                  <Lock size={14} /> Awaiting SME prioritisation
-                </span>
-              )}
-            </>
-          )
+      {agents.length === 0 ? (
+        <div className="catalog-empty">
+          <Bot size={22} />
+          <h2>No agents in this filter</h2>
+          <p>Try “All agents” to see the full set.</p>
+        </div>
+      ) : (
+        <ul className="catalog-grid catalog-grid-agents">
+          {agents.map((agent, i) => {
+            const available = agent.status === 'pilot'
+            const body = (
+              <>
+                <div className="catalog-card-top">
+                  <span className="catalog-meta">Agent {agent.number}</span>
+                  <span className={`catalog-badge ${available ? 'live' : 'soon'}`}>
+                    {available ? 'Ready to run' : 'After consultation'}
+                  </span>
+                </div>
+                <div className="agent-card-icon" aria-hidden>
+                  <Bot size={18} />
+                </div>
+                <h2>{agent.name}</h2>
+                <p>{agent.purpose}</p>
+                <div className="catalog-card-foot">
+                  <span className="catalog-time">CSV upload · structured output</span>
+                  {available ? (
+                    <span className="catalog-cta">
+                      Open agent <ArrowRight size={16} />
+                    </span>
+                  ) : (
+                    <span className="catalog-locked">
+                      <Lock size={14} /> Prioritise in consultation
+                    </span>
+                  )}
+                </div>
+              </>
+            )
 
-          return (
-            <li key={agent.id}>
-              {available ? (
-                <Link to={`/agents/${agent.id}`} className="cb-module-list-item is-clickable">
-                  {item}
-                </Link>
-              ) : (
-                <div className="cb-module-list-item is-locked">{item}</div>
-              )}
-            </li>
-          )
-        })}
-      </ul>
+            return (
+              <motion.li
+                key={agent.id}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i, 8) * 0.04, duration: 0.35 }}
+              >
+                {available ? (
+                  <Link to={`/agents/${agent.id}`} className="catalog-card is-live is-agent">
+                    {body}
+                  </Link>
+                ) : (
+                  <div className="catalog-card is-locked is-agent">{body}</div>
+                )}
+              </motion.li>
+            )
+          })}
+        </ul>
+      )}
     </div>
   )
 }

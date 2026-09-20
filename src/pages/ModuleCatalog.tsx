@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Lock } from 'lucide-react'
+import { motion } from 'motion/react'
+import { ArrowRight, Clock3, Lock, Sparkles } from 'lucide-react'
 import { LEARNING_MODULES } from '../data/learningModules'
-import './Platform2.css'
+import './Catalog.css'
 
 type Filter = 'all' | 'available' | 'upcoming'
 
@@ -16,20 +17,20 @@ export function ModuleCatalog() {
   })
 
   return (
-    <div className="cb-page">
-      <header className="cb-page-head">
-        <p className="cb-kicker">Training courses</p>
-        <h1>Choose a course</h1>
-        <p>
-          Ten topics for digital and green transition in dairy SMEs — aligned with the company
-          consultation questionnaire.
+    <div className="catalog">
+      <header className="catalog-hero">
+        <p className="catalog-eyebrow">Learning</p>
+        <h1>Training built for dairy operations</h1>
+        <p className="catalog-lede">
+          Practical modules for digital and green transition. Start with what is live today, then
+          unlock more topics after your company consultation.
         </p>
       </header>
 
-      <div className="cb-filters" role="tablist" aria-label="Module filters">
+      <div className="catalog-toolbar" role="tablist" aria-label="Course filters">
         {(
           [
-            ['all', 'All modules'],
+            ['all', 'All courses'],
             ['available', 'Available now'],
             ['upcoming', 'Coming soon'],
           ] as const
@@ -39,7 +40,7 @@ export function ModuleCatalog() {
             type="button"
             role="tab"
             aria-selected={filter === id}
-            className={`cb-filter ${filter === id ? 'is-active' : ''}`}
+            className={`catalog-tab${filter === id ? ' is-active' : ''}`}
             onClick={() => setFilter(id)}
           >
             {label}
@@ -47,49 +48,65 @@ export function ModuleCatalog() {
         ))}
       </div>
 
-      <ul className="cb-module-list">
-        {modules.map((mod) => {
-          const available = mod.status === 'pilot'
-          const item = (
-            <>
-              <div className="cb-module-list-top">
-                <span className="cb-module-num">Module {mod.number}</span>
-                <span className={`cb-badge ${mod.status}`}>
-                  {available ? 'Available' : 'After consultation'}
-                </span>
-              </div>
-              <h2>{mod.title}</h2>
-              <p>{mod.description}</p>
-              <p className="cb-module-time">
-                {available
-                  ? `${mod.duration} to walk through this demo`
-                  : `${mod.duration} · self-paced`}
-              </p>
-              {available ? (
-                <span className="cb-module-action">
-                  Start module <ArrowRight size={16} />
-                </span>
-              ) : (
-                <span className="cb-module-locked">
-                  <Lock size={14} /> Awaiting SME prioritisation
-                </span>
-              )}
-            </>
-          )
+      {modules.length === 0 ? (
+        <div className="catalog-empty">
+          <Sparkles size={22} />
+          <h2>No courses in this filter</h2>
+          <p>Try “All courses” to see the full catalogue.</p>
+        </div>
+      ) : (
+        <ul className="catalog-grid">
+          {modules.map((mod, i) => {
+            const available = mod.status === 'pilot'
+            const body = (
+              <>
+                <div className="catalog-card-top">
+                  <span className="catalog-meta">Module {mod.number}</span>
+                  <span className={`catalog-badge ${available ? 'live' : 'soon'}`}>
+                    {available ? 'Available' : 'After consultation'}
+                  </span>
+                </div>
+                <h2>{mod.title}</h2>
+                <p>{mod.description}</p>
+                <div className="catalog-card-foot">
+                  <span className="catalog-time">
+                    <Clock3 size={14} />
+                    {available
+                      ? `${mod.duration} demo`
+                      : mod.fullDuration ?? mod.duration}
+                  </span>
+                  {available ? (
+                    <span className="catalog-cta">
+                      Start course <ArrowRight size={16} />
+                    </span>
+                  ) : (
+                    <span className="catalog-locked">
+                      <Lock size={14} /> Prioritise in consultation
+                    </span>
+                  )}
+                </div>
+              </>
+            )
 
-          return (
-            <li key={mod.id}>
-              {available ? (
-                <Link to={`/modules/${mod.id}`} className="cb-module-list-item is-clickable">
-                  {item}
-                </Link>
-              ) : (
-                <div className="cb-module-list-item is-locked">{item}</div>
-              )}
-            </li>
-          )
-        })}
-      </ul>
+            return (
+              <motion.li
+                key={mod.id}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i, 8) * 0.04, duration: 0.35 }}
+              >
+                {available ? (
+                  <Link to={`/modules/${mod.id}`} className="catalog-card is-live">
+                    {body}
+                  </Link>
+                ) : (
+                  <div className="catalog-card is-locked">{body}</div>
+                )}
+              </motion.li>
+            )
+          })}
+        </ul>
+      )}
     </div>
   )
 }

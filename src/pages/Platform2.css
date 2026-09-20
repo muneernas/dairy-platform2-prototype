@@ -18,12 +18,35 @@
   color: var(--muted);
 }
 
+.cb-page-head {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 44rem;
+  padding-bottom: 0.25rem;
+}
+
+.cb-page-head h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 3.5vw, 2.45rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--navy-900);
+}
+
+.cb-page-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1.02rem;
+}
+
 .cb-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-sm);
 }
 
 .cb-back {
@@ -101,8 +124,11 @@
 
 .cb-agent-title {
   margin: 0.35rem 0 0.5rem;
-  font-size: clamp(1.35rem, 3vw, 1.75rem);
-  color: var(--bg-deep);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  letter-spacing: -0.02em;
+  color: var(--navy-900);
 }
 
 .cb-agent-learn {
