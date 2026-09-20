@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Clock3, Lock, Sparkles } from 'lucide-react'
 import { LEARNING_MODULES } from '../data/learningModules'
+import { useI18n } from '../i18n/I18nProvider'
 import './Catalog.css'
 
 type Filter = 'all' | 'available' | 'upcoming'
 
 export function ModuleCatalog() {
+  const { t } = useI18n()
   const [filter, setFilter] = useState<Filter>('all')
 
   const modules = LEARNING_MODULES.filter((mod) => {
@@ -19,20 +21,17 @@ export function ModuleCatalog() {
   return (
     <div className="catalog">
       <header className="catalog-hero">
-        <p className="catalog-eyebrow">Learning</p>
-        <h1>Training built for dairy operations</h1>
-        <p className="catalog-lede">
-          Practical modules for digital and green transition. Start with what is live today, then
-          unlock more topics after your company consultation.
-        </p>
+        <p className="catalog-eyebrow">{t('catalog.learning.eyebrow')}</p>
+        <h1>{t('catalog.learning.title')}</h1>
+        <p className="catalog-lede">{t('catalog.learning.lede')}</p>
       </header>
 
-      <div className="catalog-toolbar" role="tablist" aria-label="Course filters">
+      <div className="catalog-toolbar" role="tablist" aria-label={t('catalog.learning.eyebrow')}>
         {(
           [
-            ['all', 'All courses'],
-            ['available', 'Available now'],
-            ['upcoming', 'Coming soon'],
+            ['all', t('catalog.filter.allCourses')],
+            ['available', t('catalog.filter.available')],
+            ['upcoming', t('catalog.filter.upcoming')],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -51,8 +50,8 @@ export function ModuleCatalog() {
       {modules.length === 0 ? (
         <div className="catalog-empty">
           <Sparkles size={22} />
-          <h2>No courses in this filter</h2>
-          <p>Try “All courses” to see the full catalogue.</p>
+          <h2>{t('catalog.emptyCourses')}</h2>
+          <p>{t('catalog.emptyHint')}</p>
         </div>
       ) : (
         <ul className="catalog-grid">
@@ -61,9 +60,11 @@ export function ModuleCatalog() {
             const body = (
               <>
                 <div className="catalog-card-top">
-                  <span className="catalog-meta">Module {mod.number}</span>
+                  <span className="catalog-meta">
+                    {t('catalog.module')} {mod.number}
+                  </span>
                   <span className={`catalog-badge ${available ? 'live' : 'soon'}`}>
-                    {available ? 'Available' : 'After consultation'}
+                    {available ? t('catalog.available') : t('catalog.afterConsultation')}
                   </span>
                 </div>
                 <h2>{mod.title}</h2>
@@ -71,17 +72,15 @@ export function ModuleCatalog() {
                 <div className="catalog-card-foot">
                   <span className="catalog-time">
                     <Clock3 size={14} />
-                    {available
-                      ? `${mod.duration} demo`
-                      : mod.fullDuration ?? mod.duration}
+                    {available ? mod.duration : (mod.fullDuration ?? mod.duration)}
                   </span>
                   {available ? (
                     <span className="catalog-cta">
-                      Start course <ArrowRight size={16} />
+                      {t('catalog.start')} <ArrowRight size={16} className="dir-aware-icon" />
                     </span>
                   ) : (
                     <span className="catalog-locked">
-                      <Lock size={14} /> Prioritise in consultation
+                      <Lock size={14} /> {t('catalog.locked')}
                     </span>
                   )}
                 </div>

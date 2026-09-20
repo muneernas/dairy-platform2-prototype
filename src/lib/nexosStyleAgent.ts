@@ -45,11 +45,20 @@ export const FORECAST_AGENT_INSTRUCTIONS = `You are the Platform 2 Demand Foreca
 - When relevant, mention risks (waste/stockout) and one clear next action.
 - Do not dump the whole knowledge base; answer the latest question.`
 
-function buildSystemPrompt(knowledge: KnowledgeChunk[], runContext: string): string {
+function buildSystemPrompt(
+  knowledge: KnowledgeChunk[],
+  runContext: string,
+  replyLocale?: string,
+): string {
   const kb =
     knowledge.length === 0
       ? '(no knowledge excerpts)'
       : knowledge.map((k) => `### ${k.title}\n${k.body}`).join('\n\n')
+
+  const language =
+    replyLocale && replyLocale !== 'en'
+      ? `\n\n## Language\nReply in the user's UI language (${replyLocale === 'ar' ? 'Arabic' : replyLocale === 'fr' ? 'French' : replyLocale === 'el' ? 'Greek' : replyLocale}). Keep SKU names and numbers as in the data.`
+      : ''
 
   return `${FORECAST_AGENT_INSTRUCTIONS}
 
@@ -57,7 +66,7 @@ function buildSystemPrompt(knowledge: KnowledgeChunk[], runContext: string): str
 ${runContext}
 
 ## Knowledge base excerpts (treat as attached nexos knowledge)
-${kb}`
+${kb}${language}`
 }
 
 async function callOpenAiCompatible(opts: {
@@ -121,10 +130,11 @@ export async function askNexosStyleForecastAgent(
   userQuestion: string,
   runContext: string,
   history: ChatTurn[] = [],
+  replyLocale?: string,
 ): Promise<AgentChatReply> {
   const knowledge = retrieveKnowledge(userQuestion)
   const knowledgeUsed = knowledge.map((k) => k.title)
-  const system = buildSystemPrompt(knowledge, runContext)
+  const system = buildSystemPrompt(knowledge, runContext, replyLocale)
   const messages: ChatTurn[] = [...history, { role: 'user', content: userQuestion }]
 
   const nexosKey = (import.meta.env.VITE_NEXOS_API_KEY as string | undefined)?.trim()

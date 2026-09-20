@@ -196,3 +196,24 @@ a {
   font-size: 1rem;
   border-radius: 12px;
 }
+
+[dir='rtl'] .dir-aware-icon {
+  transform: scaleX(-1);
+}
+
+[dir='rtl'] .lm-nav,
+[dir='rtl'] .lm-intro-actions,
+[dir='rtl'] .lm-complete-actions,
+[dir='rtl'] .lm-meta-row,
+[dir='rtl'] .cb-apply-actions,
+[dir='rtl'] .cb-chat-composer {
+  flex-direction: row-reverse;
+}
+
+[dir='rtl'] .lm-back,
+[dir='rtl'] .lm-obj-list li,
+[dir='rtl'] .lm-path li,
+[dir='rtl'] .lm-steps li,
+[dir='rtl'] .cb-list li {
+  text-align: right;
+}

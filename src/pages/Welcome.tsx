@@ -12,22 +12,8 @@ import {
 } from 'lucide-react'
 import { LEARNING_MODULES } from '../data/learningModules'
 import { AGENT_CATALOG } from '../data/agents'
+import { useI18n } from '../i18n/I18nProvider'
 import './Welcome.css'
-
-const JOURNEY = [
-  { label: 'Learn', detail: 'Practical modules' },
-  { label: 'Practice', detail: 'Realistic dairy data' },
-  { label: 'Apply', detail: 'Your company files' },
-  { label: 'Analyse', detail: 'AI agent insights' },
-  { label: 'Improve', detail: 'Better decisions' },
-] as const
-
-const WORKFLOW = [
-  { icon: Upload, label: 'Upload CSV' },
-  { icon: FileSpreadsheet, label: 'Data checked' },
-  { icon: Sparkles, label: 'Agent runs' },
-  { icon: BarChart3, label: 'Insights ready' },
-] as const
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -39,9 +25,33 @@ const fadeUp = {
 }
 
 export function Welcome() {
+  const { t } = useI18n()
   const pilotCourse = LEARNING_MODULES.find((m) => m.status === 'pilot')
   const pilotAgent = AGENT_CATALOG.find((a) => a.status === 'pilot')
   const upcomingCourses = LEARNING_MODULES.filter((m) => m.status === 'planned').slice(0, 3)
+
+  const journey = [
+    { label: t('home.journey.learn'), detail: t('home.journey.learn.d') },
+    { label: t('home.journey.practice'), detail: t('home.journey.practice.d') },
+    { label: t('home.journey.apply'), detail: t('home.journey.apply.d') },
+    { label: t('home.journey.analyse'), detail: t('home.journey.analyse.d') },
+    { label: t('home.journey.improve'), detail: t('home.journey.improve.d') },
+  ]
+
+  const workflow = [
+    { icon: Upload, label: t('home.workflow.upload') },
+    { icon: FileSpreadsheet, label: t('home.workflow.checked') },
+    { icon: Sparkles, label: t('home.workflow.runs') },
+    { icon: BarChart3, label: t('home.workflow.insights') },
+  ]
+
+  const flow = [
+    { t: t('home.flow.training'), d: t('home.flow.training.d') },
+    { t: t('home.flow.knowledge'), d: t('home.flow.knowledge.d') },
+    { t: t('home.flow.data'), d: t('home.flow.data.d') },
+    { t: t('home.flow.agent'), d: t('home.flow.agent.d') },
+    { t: t('home.flow.decision'), d: t('home.flow.decision.d') },
+  ]
 
   return (
     <div className="home">
@@ -53,56 +63,49 @@ export function Welcome() {
           variants={{ show: { transition: { staggerChildren: 0.08 } } }}
         >
           <motion.p className="home-eyebrow" variants={fadeUp} custom={0}>
-            Dairy SME Programme · Capacity building
+            {t('home.eyebrow')}
           </motion.p>
           <motion.h1 className="home-title" variants={fadeUp} custom={1}>
-            Build operational skill.
-            <span>Make sharper decisions.</span>
+            {t('home.title1')}
+            <span>{t('home.title2')}</span>
           </motion.h1>
           <motion.p className="home-lede" variants={fadeUp} custom={2}>
-            A practical platform for dairy companies: learn with guided training, then put AI agents
-            to work on your own sales and operations files - without leaving the programme.
+            {t('home.lede')}
           </motion.p>
           <motion.div className="home-cta-row" variants={fadeUp} custom={3}>
             <Link to="/pathways" className="btn btn-primary btn-lg">
-              Explore training
-              <ArrowRight size={18} />
+              {t('home.cta.training')}
+              <ArrowRight size={18} className="dir-aware-icon" />
             </Link>
             <Link to="/agents" className="btn btn-secondary btn-lg">
               <Bot size={18} />
-              Run an AI agent
+              {t('home.cta.agent')}
             </Link>
           </motion.div>
           <motion.ul className="home-trust" variants={fadeUp} custom={4}>
             <li>
-              <CheckCircle2 size={16} /> Grounded in dairy operations
+              <CheckCircle2 size={16} /> {t('home.trust1')}
             </li>
             <li>
-              <CheckCircle2 size={16} /> Works with CSV exports
+              <CheckCircle2 size={16} /> {t('home.trust2')}
             </li>
             <li>
-              <CheckCircle2 size={16} /> Built for non-technical teams
+              <CheckCircle2 size={16} /> {t('home.trust3')}
             </li>
           </motion.ul>
         </motion.div>
 
         <motion.aside
           className="home-hero-visual"
-          aria-label="How learning connects to AI insights"
+          aria-label={t('home.flow.kicker')}
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="flow-card">
-            <p className="flow-kicker">Learning → Insight loop</p>
+            <p className="flow-kicker">{t('home.flow.kicker')}</p>
             <ol className="flow-nodes">
-              {[
-                { t: 'Training', d: 'Skills & practice data' },
-                { t: 'Knowledge', d: 'Dairy context & rules' },
-                { t: 'Business data', d: 'Your CSV exports' },
-                { t: 'AI agent', d: 'Forecast & explain' },
-                { t: 'Decision', d: 'Manager reviews' },
-              ].map((node, i) => (
+              {flow.map((node, i) => (
                 <li key={node.t}>
                   <span className="flow-index">{i + 1}</span>
                   <div>
@@ -117,13 +120,13 @@ export function Welcome() {
         </motion.aside>
       </section>
 
-      <section className="home-journey" aria-label="Programme journey">
+      <section className="home-journey" aria-label={t('home.journey.title')}>
         <div className="home-section-head">
-          <p className="home-eyebrow">How it works</p>
-          <h2>One journey from skill to decision</h2>
+          <p className="home-eyebrow">{t('home.journey.kicker')}</p>
+          <h2>{t('home.journey.title')}</h2>
         </div>
         <ol className="journey-track">
-          {JOURNEY.map((step, i) => (
+          {journey.map((step, i) => (
             <motion.li
               key={step.label}
               initial={{ opacity: 0, y: 12 }}
@@ -148,24 +151,21 @@ export function Welcome() {
           <div className="pathway-icon" aria-hidden>
             <BookOpen size={22} />
           </div>
-          <p className="home-eyebrow">Learning</p>
-          <h2>Training that mirrors the plant floor</h2>
-          <p>
-            Self-paced modules with practice tables, exercises, and a knowledge check - then the
-            same agent on a company file.
-          </p>
+          <p className="home-eyebrow">{t('home.learn.eyebrow')}</p>
+          <h2>{t('home.learn.title')}</h2>
+          <p>{t('home.learn.body')}</p>
           {pilotCourse && (
             <Link to={`/modules/${pilotCourse.id}`} className="featured-course">
               <div>
-                <span className="pill pill-live">Available now</span>
+                <span className="pill pill-live">{t('home.learn.available')}</span>
                 <h3>{pilotCourse.title}</h3>
-                <p>{pilotCourse.duration} demo · full course 45–90 min</p>
+                <p>{pilotCourse.duration}</p>
               </div>
-              <ArrowRight size={18} />
+              <ArrowRight size={18} className="dir-aware-icon" />
             </Link>
           )}
           <Link to="/pathways" className="btn btn-secondary">
-            Browse all courses
+            {t('home.learn.browse')}
           </Link>
         </motion.div>
 
@@ -177,29 +177,26 @@ export function Welcome() {
           <div className="pathway-icon pathway-icon-agent" aria-hidden>
             <Bot size={22} />
           </div>
-          <p className="home-eyebrow">AI agents</p>
-          <h2>Put your business data to work</h2>
-          <p>
-            Skip the lesson when you already have numbers. Upload a CSV, run a specialist agent, and
-            chat about the results.
-          </p>
+          <p className="home-eyebrow">{t('home.agents.eyebrow')}</p>
+          <h2>{t('home.agents.title')}</h2>
+          <p>{t('home.agents.body')}</p>
 
           <div className="mini-workflow" aria-hidden>
-            {WORKFLOW.map((step, i) => (
+            {workflow.map((step, i) => (
               <div key={step.label} className="mini-step">
                 <span className="mini-icon">
                   <step.icon size={14} />
                 </span>
                 <span>{step.label}</span>
-                {i < WORKFLOW.length - 1 && <span className="mini-arrow">→</span>}
+                {i < workflow.length - 1 && <span className="mini-arrow">→</span>}
               </div>
             ))}
           </div>
 
           {pilotAgent && (
             <Link to={`/agents/${pilotAgent.id}`} className="btn btn-primary">
-              Open {pilotAgent.name.replace(' agent', '')}
-              <ArrowRight size={16} />
+              {t('home.agents.open')}
+              <ArrowRight size={16} className="dir-aware-icon" />
             </Link>
           )}
         </motion.div>
@@ -208,11 +205,11 @@ export function Welcome() {
       <section className="home-upcoming">
         <div className="home-section-head row">
           <div>
-            <p className="home-eyebrow">Coming through consultation</p>
-            <h2>More training on the roadmap</h2>
+            <p className="home-eyebrow">{t('home.upcoming.eyebrow')}</p>
+            <h2>{t('home.upcoming.title')}</h2>
           </div>
           <Link to="/pathways" className="text-link">
-            View catalogue <ArrowRight size={16} />
+            {t('home.upcoming.view')} <ArrowRight size={16} className="dir-aware-icon" />
           </Link>
         </div>
         <div className="upcoming-grid">
@@ -225,7 +222,9 @@ export function Welcome() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.06 }}
             >
-              <span className="upcoming-num">Module {mod.number}</span>
+              <span className="upcoming-num">
+                {t('catalog.module')} {mod.number}
+              </span>
               <h3>{mod.title}</h3>
               <p>{mod.description}</p>
             </motion.article>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Send, Sparkles } from 'lucide-react'
 import { askForecastAgent } from '../lib/nexosClient'
 import type { AgentReplySource, ChatTurn } from '../lib/nexosStyleAgent'
+import { useI18n } from '../i18n/I18nProvider'
 
 interface ChatMessage {
   id: string
@@ -18,30 +19,32 @@ interface Props {
   placeholder?: string
 }
 
-function sourceLabel(source: AgentReplySource | undefined): string {
-  if (source === 'nexos') return 'nexos.ai'
-  if (source === 'stand-in') return 'Live LLM + knowledge base'
-  if (source === 'mock') return 'Offline knowledge base'
-  return 'Forecast agent'
-}
-
-export function AgentFollowUpChat({
-  runContext,
-  placeholder = 'Ask about yogurt volatility, waste risk, signals…',
-}: Props) {
+export function AgentFollowUpChat({ runContext, placeholder }: Props) {
+  const { t, locale } = useI18n()
   const [draft, setDraft] = useState('')
   const [loading, setLoading] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>(() => [
-    {
-      id: 'welcome',
-      role: 'assistant',
-      content:
-        'I’ve analysed this run. Ask me anything about the forecast, external signals, risks, or what to do next - I’ll reply in this chat.',
-      source: 'stand-in',
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
   const threadRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  function sourceLabel(source: AgentReplySource | undefined): string {
+    if (source === 'nexos') return t('chat.sourceNexos')
+    if (source === 'stand-in') return t('chat.sourceLive')
+    if (source === 'mock') return t('chat.sourceOffline')
+    return t('chat.sourceDefault')
+  }
+
+  useEffect(() => {
+    setMessages([
+      {
+        id: 'welcome',
+        role: 'assistant',
+        content: t('chat.welcome'),
+        source: 'stand-in',
+      },
+    ])
+    setDraft('')
+  }, [locale, t])
 
   useEffect(() => {
     const el = threadRef.current
@@ -67,7 +70,7 @@ export function AgentFollowUpChat({
     setDraft('')
     setLoading(true)
 
-    const result = await askForecastAgent(question, runContext, historyForApi)
+    const result = await askForecastAgent(question, runContext, historyForApi, locale)
 
     setMessages((prev) => [
       ...prev,
@@ -84,40 +87,39 @@ export function AgentFollowUpChat({
     inputRef.current?.focus()
   }
 
-  const suggestions = [
-    'Why is yogurt high volatility?',
-    'Which signal drove the spike?',
-    'How do I cut waste risk?',
-  ]
+  const suggestions = [t('chat.suggest1'), t('chat.suggest2'), t('chat.suggest3')]
+  const inputPlaceholder = placeholder ?? t('chat.placeholder')
 
   return (
     <div className="cb-chat">
       <div className="cb-chat-head">
         <Sparkles size={18} aria-hidden />
         <div>
-          <p className="cb-info-label">Chat with the forecast agent</p>
-          <p className="cb-muted cb-ask-hint">
-            Multi-turn Q&amp;A on this run - same pattern as a nexos agent follow-up.
-          </p>
+          <p className="cb-info-label">{t('chat.head')}</p>
+          <p className="cb-muted cb-ask-hint">{t('chat.hint')}</p>
         </div>
       </div>
 
       <div className="cb-chat-thread" ref={threadRef} role="log" aria-live="polite">
         {messages.map((m) => (
           <div key={m.id} className={`cb-chat-bubble cb-chat-${m.role}`}>
-            <span className="cb-chat-who">{m.role === 'user' ? 'You' : sourceLabel(m.source)}</span>
+            <span className="cb-chat-who">
+              {m.role === 'user' ? t('chat.you') : sourceLabel(m.source)}
+            </span>
             <div className="cb-chat-text">{m.content}</div>
             {m.fallbackReason && (
               <p className="cb-feedback warn cb-llm-fallback">{m.fallbackReason}</p>
             )}
             {m.knowledgeUsed && m.knowledgeUsed.length > 0 && m.role === 'assistant' && (
-              <p className="cb-kb-used">Knowledge: {m.knowledgeUsed.join(' · ')}</p>
+              <p className="cb-kb-used">
+                {t('chat.knowledge', { items: m.knowledgeUsed.join(' · ') })}
+              </p>
             )}
           </div>
         ))}
         {loading && (
           <div className="cb-chat-bubble cb-chat-assistant cb-chat-typing">
-            <span className="cb-chat-who">Agent</span>
+            <span className="cb-chat-who">{t('chat.agent')}</span>
             <div className="cb-chat-text">
               <span className="cb-typing-dot" />
               <span className="cb-typing-dot" />
@@ -154,7 +156,7 @@ export function AgentFollowUpChat({
           ref={inputRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder={placeholder}
+          placeholder={inputPlaceholder}
           rows={2}
           disabled={loading}
           onKeyDown={(e) => {
@@ -168,10 +170,10 @@ export function AgentFollowUpChat({
           type="submit"
           className="btn btn-primary cb-chat-send"
           disabled={loading || !draft.trim()}
-          aria-label="Send message"
+          aria-label={t('chat.sendAria')}
         >
-          <Send size={16} />
-          {loading ? '…' : 'Send'}
+          <Send size={16} className="dir-aware-icon" />
+          {loading ? '…' : t('chat.send')}
         </button>
       </form>
     </div>

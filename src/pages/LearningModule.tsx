@@ -20,6 +20,7 @@ import { AgentFollowUpChat } from '../components/AgentFollowUpChat'
 import { getModuleDetail } from '../data/learningModules'
 import { runForecastAgentOnPractice } from '../lib/forecastAgent'
 import type { CompanyAnalysis } from '../lib/companyForecast'
+import { useI18n } from '../i18n/I18nProvider'
 import {
   MODULE_STEPS,
   type AgentInsight,
@@ -30,6 +31,15 @@ import './Platform2.css'
 import './LearningModule.css'
 
 type Phase = 'intro' | 'learning' | 'complete'
+
+const STEP_KEYS: Record<ModuleStepId, { label: string; desc: string }> = {
+  objectives: { label: 'step.objectives', desc: 'step.objectives.d' },
+  'simulated-data': { label: 'step.data', desc: 'step.data.d' },
+  exercise: { label: 'step.exercise', desc: 'step.exercise.d' },
+  'agent-analysis': { label: 'step.agent', desc: 'step.agent.d' },
+  assessment: { label: 'step.assessment', desc: 'step.assessment.d' },
+  'apply-company': { label: 'step.apply', desc: 'step.apply.d' },
+}
 
 export function LearningModule() {
   const { moduleId } = useParams<{ moduleId: string }>()
@@ -43,6 +53,7 @@ export function LearningModule() {
 }
 
 function LearningModuleRunner({ module }: { module: ModuleDetail }) {
+  const { t } = useI18n()
   const [phase, setPhase] = useState<Phase>('intro')
   const [stepIndex, setStepIndex] = useState(0)
   const [exerciseIndex, setExerciseIndex] = useState(0)
@@ -68,6 +79,14 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     const correct = module.assessment.filter((q) => assessmentAnswers[q.id] === q.correctValue)
     return Math.round((correct.length / module.assessment.length) * 100)
   }, [module, assessmentAnswers])
+
+  function stepLabel(id: ModuleStepId) {
+    return t(STEP_KEYS[id].label)
+  }
+
+  function stepDesc(id: ModuleStepId) {
+    return t(STEP_KEYS[id].desc)
+  }
 
   function handleExerciseSelect(value: string) {
     const ex = currentExercise
@@ -189,10 +208,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
       case 'objectives':
         return (
           <div className="lm-body">
-            <p className="lm-lead">
-              By the end of this course, your team will use an AI forecasting agent to support
-              production planning and reduce waste or stockouts.
-            </p>
+            <p className="lm-lead">{t('learn.objectivesLead')}</p>
             <ul className="lm-obj-grid">
               {module.learningObjectives.map((obj) => (
                 <li key={obj}>
@@ -202,7 +218,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               ))}
             </ul>
             <div className="lm-case">
-              <p className="lm-info-label">Training case</p>
+              <p className="lm-info-label">{t('learn.trainingCase')}</p>
               <h3>{module.companyProfile.name}</h3>
               <p>
                 {module.companyProfile.type} · {module.companyProfile.location}
@@ -215,44 +231,38 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
       case 'simulated-data':
         return (
           <div className="lm-body">
-            <p className="lm-lead">
-              Review weekly sales <strong>and</strong> the external signals calendar. Link spikes in
-              the sales table to holidays, school terms, and promotions before the guided exercise.
-            </p>
+            <p className="lm-lead">{t('learn.dataLead')}</p>
             <div className="lm-stats">
               <div className="lm-stat">
-                <span>Weeks</span>
+                <span>{t('learn.weeks')}</span>
                 <strong>8</strong>
               </div>
               <div className="lm-stat">
-                <span>SKUs</span>
+                <span>{t('learn.skus')}</span>
                 <strong>4</strong>
               </div>
               <div className="lm-stat">
-                <span>Signals</span>
+                <span>{t('learn.signals')}</span>
                 <strong>{module.externalSignals?.length ?? 0}</strong>
               </div>
               <div className="lm-stat">
-                <span>Highest volatility</span>
-                <strong>Yogurt</strong>
+                <span>{t('learn.volatility')}</span>
+                <strong>{t('learn.yogurt')}</strong>
               </div>
             </div>
 
             {module.externalSignals && module.externalSignals.length > 0 && (
               <div className="lm-panel-block">
-                <h3>External signals calendar</h3>
-                <p className="cb-muted">
-                  Holidays, school terms, promotions, Ramadan - the same optional file you can upload
-                  later.
-                </p>
+                <h3>{t('learn.signalsCalendar')}</h3>
+                <p className="cb-muted">{t('learn.signalsHint')}</p>
                 <div className="cb-table-wrap">
                   <table className="cb-table cb-table-compact">
                     <thead>
                       <tr>
-                        <th>Period</th>
-                        <th>Event</th>
-                        <th>Type</th>
-                        <th>Expected impact</th>
+                        <th>{t('learn.period')}</th>
+                        <th>{t('learn.event')}</th>
+                        <th>{t('learn.type')}</th>
+                        <th>{t('learn.impact')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -278,20 +288,20 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               onClick={() => setShowFullData((v) => !v)}
               aria-expanded={showFullData}
             >
-              {showFullData ? 'Hide weekly sales table' : 'View weekly sales table'}
+              {showFullData ? t('learn.hideSales') : t('learn.viewSales')}
               <ChevronDown size={16} className={showFullData ? 'is-open' : ''} />
             </button>
             {showFullData && (
               <div className="cb-table-wrap">
-                <p className="lm-info-label">Weekly sales by SKU</p>
+                <p className="lm-info-label">{t('learn.weeklySales')}</p>
                 <table className="cb-table">
                   <thead>
                     <tr>
-                      <th>Period</th>
+                      <th>{t('learn.period')}</th>
                       <th>SKU</th>
-                      <th>Category</th>
-                      <th>Units</th>
-                      <th>Channel</th>
+                      <th>{t('learn.category')}</th>
+                      <th>{t('learn.units')}</th>
+                      <th>{t('learn.channel')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -315,7 +325,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
         return (
           <div className="lm-body">
             <p className="lm-q-meta">
-              Question {exerciseIndex + 1} of {module.exercises.length}
+              {t('learn.questionOf', {
+                current: exerciseIndex + 1,
+                total: module.exercises.length,
+              })}
             </p>
             <h3 className="lm-question">{currentExercise.prompt}</h3>
             {currentExercise.context && <p className="cb-muted">{currentExercise.context}</p>}
@@ -347,44 +360,35 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 <div className="lm-agent-launch-icon" aria-hidden>
                   <Sparkles size={22} />
                 </div>
-                <p>
-                  Run the forecasting agent on the practice sales table and external signals. Same
-                  file-in → insights-out pattern as production - then chat about the results.
-                </p>
+                <p>{t('learn.agentLaunch')}</p>
                 <button
                   type="button"
                   className="btn btn-primary btn-lg"
                   onClick={() => void handleRunForecastAgent()}
                   disabled={agentRunning}
                 >
-                  {agentRunning ? 'Running agent…' : 'Run forecast analysis'}
+                  {agentRunning ? t('learn.running') : t('learn.runAgent')}
                 </button>
-                {agentRunning && (
-                  <p className="cb-muted">
-                    Reading sales + signals, linking spikes, building next-week forecast…
-                  </p>
-                )}
+                {agentRunning && <p className="cb-muted">{t('learn.agentRunningHint')}</p>}
               </div>
             ) : (
               <>
-                <p className="cb-agent-engine">
-                  Forecast agent · practice run · chat uses live LLM + knowledge base when configured
-                </p>
+                <p className="cb-agent-engine">{t('learn.agentEngine')}</p>
                 <div className="lm-case">
                   <p className="lm-info-label">{insight.headline}</p>
                   <p>{insight.summary}</p>
                 </div>
                 {insight.externalSignalsUsed && insight.externalSignalsUsed.length > 0 && (
                   <div className="lm-panel-block">
-                    <h3>External signals used</h3>
+                    <h3>{t('learn.signalsUsed')}</h3>
                     <div className="cb-table-wrap">
                       <table className="cb-table cb-table-compact">
                         <thead>
                           <tr>
-                            <th>Period</th>
-                            <th>Event</th>
-                            <th>Type</th>
-                            <th>Linked to sales</th>
+                            <th>{t('learn.period')}</th>
+                            <th>{t('learn.event')}</th>
+                            <th>{t('learn.type')}</th>
+                            <th>{t('learn.linkedSales')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -410,7 +414,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                     <div key={f.sku} className="cb-forecast-card">
                       <h4>{f.sku}</h4>
                       <p>
-                        {f.nextPeriod}: <strong>{f.forecastUnits.toLocaleString()}</strong> units
+                        {t('learn.forecastUnits', {
+                          period: f.nextPeriod,
+                          units: f.forecastUnits.toLocaleString(),
+                        })}
                       </p>
                       <span className={`cb-trend ${f.trend}`}>{f.trend}</span>
                     </div>
@@ -418,7 +425,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 </div>
                 <div className="cb-split">
                   <div>
-                    <p className="lm-info-label">Recommendations</p>
+                    <p className="lm-info-label">{t('learn.recommendations')}</p>
                     <ul className="cb-list">
                       {insight.recommendations.map((r) => (
                         <li key={r}>{r}</li>
@@ -426,7 +433,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                     </ul>
                   </div>
                   <div>
-                    <p className="lm-info-label">Risks to monitor</p>
+                    <p className="lm-info-label">{t('learn.risks')}</p>
                     <ul className="cb-list">
                       {insight.risks.map((r) => (
                         <li key={r}>{r}</li>
@@ -444,7 +451,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
         return (
           <div className="lm-body">
             <p className="lm-q-meta">
-              Question {assessmentIndex + 1} of {module.assessment.length}
+              {t('learn.questionOf', {
+                current: assessmentIndex + 1,
+                total: module.assessment.length,
+              })}
             </p>
             <h3 className="lm-question">{currentAssessment.prompt}</h3>
             <OptionChips
@@ -460,12 +470,14 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 className={`lm-feedback ${assessmentFeedback[currentAssessment.id] ? 'ok' : 'warn'}`}
               >
                 {assessmentFeedback[currentAssessment.id]
-                  ? `Correct. ${currentAssessment.ragExplanation}`
-                  : `Review: ${currentAssessment.ragExplanation}`}
+                  ? `${t('learn.correct')} ${currentAssessment.ragExplanation}`
+                  : `${t('learn.reviewAnswer')} ${currentAssessment.ragExplanation}`}
               </div>
             )}
             {assessmentComplete && assessmentIndex === module.assessment.length - 1 && (
-              <p className="lm-score-pill">Score: {assessmentScore}%</p>
+              <p className="lm-score-pill">
+                {t('learn.scoreShort', { score: assessmentScore })}
+              </p>
             )}
           </div>
         )
@@ -488,7 +500,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     return (
       <div className="lm lm-intro">
         <Link to="/pathways" className="lm-back">
-          <ArrowLeft size={16} /> Back to courses
+          <ArrowLeft size={16} className="dir-aware-icon" /> {t('learn.backCourses')}
         </Link>
 
         <motion.section
@@ -498,16 +510,18 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           transition={{ duration: 0.4 }}
         >
           <div>
-            <p className="lm-eyebrow">Course {module.number}</p>
+            <p className="lm-eyebrow">
+              {t('learn.course')} {module.number}
+            </p>
             <h1>{module.title}</h1>
             <p className="lm-intro-desc">{module.description}</p>
             <div className="lm-meta-row">
               <span className="lm-meta-pill">
-                <Clock3 size={14} /> Demo: {module.duration}
+                <Clock3 size={14} /> {t('learn.demo')}: {module.duration}
               </span>
               {module.fullDuration && (
                 <span className="lm-meta-pill">
-                  <Target size={14} /> Full course: {module.fullDuration}
+                  <Target size={14} /> {t('learn.fullCourse')}: {module.fullDuration}
                 </span>
               )}
               <span className="lm-meta-pill">
@@ -520,10 +534,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 className="btn btn-primary btn-lg"
                 onClick={() => setPhase('learning')}
               >
-                Begin course <ArrowRight size={18} />
+                {t('learn.begin')} <ArrowRight size={18} className="dir-aware-icon" />
               </button>
               <Link to={`/agents/${module.id}`} className="lm-skip">
-                Skip to agent with company files →
+                {t('learn.skipAgent')}
               </Link>
             </div>
           </div>
@@ -531,7 +545,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
         <div className="lm-intro-panels">
           <div className="lm-panel">
-            <h2>You will learn to</h2>
+            <h2>{t('learn.youWillLearn')}</h2>
             <ul className="lm-obj-list">
               {module.learningObjectives.slice(0, 4).map((obj) => (
                 <li key={obj}>
@@ -542,12 +556,12 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
             </ul>
           </div>
           <div className="lm-panel">
-            <h2>Course path</h2>
+            <h2>{t('learn.coursePath')}</h2>
             <ol className="lm-path">
               {MODULE_STEPS.map((step, i) => (
                 <li key={step.id}>
                   <span className="lm-path-num">{i + 1}</span>
-                  {step.label}
+                  {stepLabel(step.id)}
                 </li>
               ))}
             </ol>
@@ -569,20 +583,15 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
           <div className="lm-complete-icon" aria-hidden>
             <CheckCircle2 size={28} />
           </div>
-          <h1>Course complete</h1>
-          <p>
-            You practised on sales plus external signals, then ran the forecasting agent on company
-            files
-            {companyAnalysis ? ` (${companyAnalysis.companyLabel})` : ''}. Use the same
-            export-and-review loop each week before locking production.
-          </p>
-          <p className="lm-score-pill">Knowledge check: {assessmentScore}%</p>
+          <h1>{t('learn.completeTitle')}</h1>
+          <p>{t('learn.completeBody')}</p>
+          <p className="lm-score-pill">{t('learn.score', { score: assessmentScore })}</p>
           <div className="lm-complete-actions">
             <Link to={`/agents/${module.id}`} className="btn btn-primary">
-              <Bot size={16} /> Use this agent on new data
+              <Bot size={16} /> {t('learn.useAgent')}
             </Link>
             <Link to="/pathways" className="btn btn-secondary">
-              Back to courses
+              {t('learn.backCourses')}
             </Link>
             <button
               type="button"
@@ -595,7 +604,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 setCompanyAnalysis(null)
               }}
             >
-              Review course
+              {t('learn.review')}
             </button>
           </div>
         </motion.div>
@@ -606,21 +615,26 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   const nextLabel =
     (currentStep.id === 'exercise' && exerciseIndex < module.exercises.length - 1) ||
     (currentStep.id === 'assessment' && assessmentIndex < module.assessment.length - 1)
-      ? 'Continue'
+      ? t('common.continue')
       : stepIndex >= MODULE_STEPS.length - 1
-        ? 'Finish course'
-        : 'Continue'
+        ? t('learn.finish')
+        : t('common.continue')
 
   return (
     <div className="lm">
       <div className="lm-runner">
         <aside className="lm-side">
           <Link to="/pathways" className="lm-back">
-            <ArrowLeft size={16} /> Exit course
+            <ArrowLeft size={16} className="dir-aware-icon" /> {t('learn.exit')}
           </Link>
-          <p className="lm-side-kicker">Course {module.number}</p>
+          <p className="lm-side-kicker">
+            {t('learn.course')} {module.number}
+          </p>
           <h2>{module.title.replace(/^Learning to /, '')}</h2>
-          <ProgressBar value={progress} label={`${Math.round(progress)}% complete`} />
+          <ProgressBar
+            value={progress}
+            label={t('learn.pctComplete', { pct: Math.round(progress) })}
+          />
           <ol className="lm-steps">
             {MODULE_STEPS.map((step, idx) => {
               const state = idx < stepIndex ? 'done' : idx === stepIndex ? 'current' : undefined
@@ -629,7 +643,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                   <span className="lm-step-dot" aria-hidden>
                     {idx < stepIndex ? <Check size={12} strokeWidth={3} /> : idx + 1}
                   </span>
-                  <span>{step.label}</span>
+                  <span>{stepLabel(step.id)}</span>
                 </li>
               )
             })}
@@ -639,10 +653,10 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
         <section className="lm-main">
           <div className="lm-main-head">
             <p className="lm-eyebrow">
-              Step {stepIndex + 1} of {MODULE_STEPS.length}
+              {t('learn.stepOf', { current: stepIndex + 1, total: MODULE_STEPS.length })}
             </p>
-            <h1>{currentStep.label}</h1>
-            <p>{currentStep.description}</p>
+            <h1>{stepLabel(currentStep.id)}</h1>
+            <p>{stepDesc(currentStep.id)}</p>
           </div>
 
           <AnimatePresence mode="wait">
@@ -659,7 +673,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
           <div className="lm-nav">
             <button type="button" className="btn btn-ghost" onClick={goPrevStep}>
-              <ArrowLeft size={16} /> Back
+              <ArrowLeft size={16} className="dir-aware-icon" /> {t('common.back')}
             </button>
             <button
               type="button"
@@ -667,7 +681,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               onClick={goNextStep}
               disabled={!canAdvanceStep()}
             >
-              {nextLabel} <ArrowRight size={16} />
+              {nextLabel} <ArrowRight size={16} className="dir-aware-icon" />
             </button>
           </div>
         </section>

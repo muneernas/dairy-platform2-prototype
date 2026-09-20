@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Bot, FileSpreadsheet, Lock, Sparkles } from 'lucide-react'
 import { AGENT_CATALOG } from '../data/agents'
+import { useI18n } from '../i18n/I18nProvider'
 import './Catalog.css'
 
 type Filter = 'all' | 'available' | 'upcoming'
 
 export function AgentCatalog() {
+  const { t } = useI18n()
   const [filter, setFilter] = useState<Filter>('all')
 
   const agents = AGENT_CATALOG.filter((agent) => {
@@ -19,33 +21,30 @@ export function AgentCatalog() {
   return (
     <div className="catalog">
       <header className="catalog-hero catalog-hero-agent">
-        <p className="catalog-eyebrow">AI agents</p>
-        <h1>Run an agent on your company data</h1>
-        <p className="catalog-lede">
-          Upload a CSV export, get structured recommendations, and chat about the results. No
-          lesson required - learning modules stay available if you want the teaching path first.
-        </p>
+        <p className="catalog-eyebrow">{t('catalog.agents.eyebrow')}</p>
+        <h1>{t('catalog.agents.title')}</h1>
+        <p className="catalog-lede">{t('catalog.agents.lede')}</p>
         <div className="agent-strip" aria-hidden>
           <span>
-            <FileSpreadsheet size={15} /> CSV in
+            <FileSpreadsheet size={15} /> {t('catalog.strip.csv')}
           </span>
           <span className="agent-strip-sep">→</span>
           <span>
-            <Bot size={15} /> Specialist agent
+            <Bot size={15} /> {t('catalog.strip.agent')}
           </span>
           <span className="agent-strip-sep">→</span>
           <span>
-            <Sparkles size={15} /> Insights + chat
+            <Sparkles size={15} /> {t('catalog.strip.insights')}
           </span>
         </div>
       </header>
 
-      <div className="catalog-toolbar" role="tablist" aria-label="Agent filters">
+      <div className="catalog-toolbar" role="tablist" aria-label={t('catalog.agents.eyebrow')}>
         {(
           [
-            ['all', 'All agents'],
-            ['available', 'Available now'],
-            ['upcoming', 'Coming soon'],
+            ['all', t('catalog.filter.allAgents')],
+            ['available', t('catalog.filter.available')],
+            ['upcoming', t('catalog.filter.upcoming')],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -64,8 +63,8 @@ export function AgentCatalog() {
       {agents.length === 0 ? (
         <div className="catalog-empty">
           <Bot size={22} />
-          <h2>No agents in this filter</h2>
-          <p>Try “All agents” to see the full set.</p>
+          <h2>{t('catalog.emptyAgents')}</h2>
+          <p>{t('catalog.emptyHint')}</p>
         </div>
       ) : (
         <ul className="catalog-grid catalog-grid-agents">
@@ -74,9 +73,11 @@ export function AgentCatalog() {
             const body = (
               <>
                 <div className="catalog-card-top">
-                  <span className="catalog-meta">Agent {agent.number}</span>
+                  <span className="catalog-meta">
+                    {t('catalog.agent')} {agent.number}
+                  </span>
                   <span className={`catalog-badge ${available ? 'live' : 'soon'}`}>
-                    {available ? 'Ready to run' : 'After consultation'}
+                    {available ? t('catalog.ready') : t('catalog.afterConsultation')}
                   </span>
                 </div>
                 <div className="agent-card-icon" aria-hidden>
@@ -85,14 +86,14 @@ export function AgentCatalog() {
                 <h2>{agent.name}</h2>
                 <p>{agent.purpose}</p>
                 <div className="catalog-card-foot">
-                  <span className="catalog-time">CSV upload · structured output</span>
+                  <span className="catalog-time">{t('catalog.csvMeta')}</span>
                   {available ? (
                     <span className="catalog-cta">
-                      Open agent <ArrowRight size={16} />
+                      {t('catalog.open')} <ArrowRight size={16} className="dir-aware-icon" />
                     </span>
                   ) : (
                     <span className="catalog-locked">
-                      <Lock size={14} /> Prioritise in consultation
+                      <Lock size={14} /> {t('catalog.locked')}
                     </span>
                   )}
                 </div>

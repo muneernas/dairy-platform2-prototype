@@ -8,6 +8,7 @@ import {
 import { runForecastAgent } from '../lib/forecastAgent'
 import { downloadTextFile, parseCsv } from '../lib/parseCsv'
 import type { ApplyDataItem } from '../types/platform2'
+import { useI18n } from '../i18n/I18nProvider'
 import { AgentFollowUpChat } from './AgentFollowUpChat'
 
 type ItemSource = 'demo' | 'upload'
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }: Props) {
+  const { t } = useI18n()
   const [loaded, setLoaded] = useState<Record<string, LoadedItem>>({})
   const [error, setError] = useState<string | null>(null)
   const [running, setRunning] = useState(false)
@@ -54,13 +56,11 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
     const text = await file.text()
     const rows = parseCsv(text)
     if (!rows.length) {
-      setError(`Could not read ${file.name}. Use a CSV with a header row, or load the demo file.`)
+      setError(t('apply.errorRead', { name: file.name }))
       return
     }
     if (item.id === 'sales' && rowsToSales(rows).length === 0) {
-      setError(
-        `${file.name} needs columns such as period, sku, and units. Download the demo file to see the format.`,
-      )
+      setError(t('apply.errorCols', { name: file.name }))
       return
     }
     setError(null)
@@ -77,7 +77,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
 
   function runAnalysis() {
     if (!salesItem || !loaded.sales) {
-      setError('Load weekly sales first - use your file or the demo export.')
+      setError(t('apply.errorSalesFirst'))
       return
     }
     setRunning(true)
@@ -86,7 +86,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
       const salesRows = rowsToSales(parseCsv(loaded.sales.csv))
       const eventRows = loaded.events ? rowsToEvents(parseCsv(loaded.events.csv)) : []
       if (!salesRows.length) {
-        setError('The sales file did not contain usable period / SKU / units rows.')
+        setError(t('apply.errorNoRows'))
         setRunning(false)
         return
       }
@@ -97,7 +97,6 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
         companyLabel:
           loaded.sales.source === 'demo' ? salesItem.demoLabel : loaded.sales.fileLabel,
       })
-      // Keep CompanyAnalysis for parent state; enrich eventsUsed with SKU links from agent
       onAnalysis({
         ...result.analysis,
         eventsUsed:
@@ -118,10 +117,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
 
   return (
     <div className="cb-step-body">
-      <p>
-        {intro ??
-          'Attach the operational files your company would export. If you do not have a live file yet, load the demo company export to see how the same forecasting agent runs on “real” data.'}
-      </p>
+      <p>{intro ?? t('apply.intro')}</p>
 
       <ol className="cb-apply-items">
         {items.map((item) => {
@@ -129,33 +125,37 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
           return (
             <li key={item.id} className={`cb-apply-item ${current ? 'is-ready' : ''}`}>
               <div className="cb-apply-item-head">
-                <span className="cb-apply-num">{item.required ? 'Required' : 'Optional'}</span>
+                <span className="cb-apply-num">
+                  {item.required ? t('apply.required') : t('apply.optional')}
+                </span>
                 <h3>{item.title}</h3>
               </div>
               <p className="cb-muted">{item.description}</p>
               {current && (
                 <p className="cb-file-ready">
                   <FileSpreadsheet size={14} /> {current.fileLabel}
-                  {current.source === 'demo' ? ' · demo data' : ' · uploaded'}
+                  {current.source === 'demo'
+                    ? ` · ${t('apply.demoTag')}`
+                    : ` · ${t('apply.uploadedTag')}`}
                 </p>
               )}
               <div className="cb-apply-actions">
                 <button type="button" className="btn btn-ghost" onClick={() => loadDemo(item)}>
-                  Use demo file
+                  {t('apply.demo')}
                 </button>
                 <button
                   type="button"
                   className="btn btn-ghost"
                   onClick={() => downloadTextFile(item.demoFileName, item.demoCsv)}
                 >
-                  <Download size={16} /> Download template
+                  <Download size={16} /> {t('apply.template')}
                 </button>
                 <button
                   type="button"
                   className="btn btn-ghost"
                   onClick={() => fileRefs.current[item.id]?.click()}
                 >
-                  <Upload size={16} /> Upload CSV
+                  <Upload size={16} /> {t('apply.upload')}
                 </button>
                 <input
                   ref={(el) => {
@@ -178,36 +178,31 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
       {error && <div className="cb-feedback warn">{error}</div>}
 
       <div className="cb-run-box">
-        <p>
-          {salesReady
-            ? runHint ??
-              'Sales file is ready. Run the forecasting agent on this dataset - not the training table from earlier in the module.'
-            : 'Load the required sales file (demo or upload) to enable analysis.'}
-        </p>
+        <p>{salesReady ? (runHint ?? t('apply.readyHint')) : t('apply.loadHint')}</p>
         <button
           type="button"
           className="btn btn-primary"
           onClick={runAnalysis}
           disabled={!requiredReady || running}
         >
-          <Play size={16} /> {running ? 'Running analysis…' : 'Run analysis on this data'}
+          <Play size={16} /> {running ? t('apply.running') : t('apply.run')}
         </button>
       </div>
 
       {analysis && (
         <div className="cb-company-result">
-          <p className="cb-info-label">Results for {analysis.companyLabel}</p>
+          <p className="cb-info-label">{t('apply.resultsFor', { label: analysis.companyLabel })}</p>
           <div className="cb-stat-row">
             <div className="cb-stat">
-              <span className="cb-stat-label">Rows</span>
+              <span className="cb-stat-label">{t('apply.rows')}</span>
               <strong>{analysis.rowCount}</strong>
             </div>
             <div className="cb-stat">
-              <span className="cb-stat-label">SKUs</span>
+              <span className="cb-stat-label">{t('learn.skus')}</span>
               <strong>{analysis.skuCount}</strong>
             </div>
             <div className="cb-stat">
-              <span className="cb-stat-label">Periods</span>
+              <span className="cb-stat-label">{t('apply.periods')}</span>
               <strong>{analysis.periodCount}</strong>
             </div>
           </div>
@@ -216,18 +211,18 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
               <div key={f.sku} className="cb-forecast-card">
                 <h4>{f.sku}</h4>
                 <p>
-                  Next period: <strong>{f.forecastUnits.toLocaleString()}</strong> units
+                  {t('apply.nextPeriod', { units: f.forecastUnits.toLocaleString() })}
                 </p>
                 <span className={`cb-trend ${f.trend}`}>{f.trend}</span>
                 <span className={`cb-trend ${f.volatility === 'high' ? 'down' : 'stable'}`}>
-                  {f.volatility} volatility
+                  {t('apply.volatility', { level: f.volatility })}
                 </span>
               </div>
             ))}
           </div>
           {analysis.eventsUsed.length > 0 && (
             <div>
-              <p className="cb-info-label">External signals used</p>
+              <p className="cb-info-label">{t('learn.signalsUsed')}</p>
               <ul className="cb-list">
                 {analysis.eventsUsed.map((e) => (
                   <li key={e}>{e}</li>
@@ -237,7 +232,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
           )}
           <div className="cb-split">
             <div>
-              <p className="cb-info-label">Recommendations</p>
+              <p className="cb-info-label">{t('learn.recommendations')}</p>
               <ul className="cb-list">
                 {analysis.recommendations.map((r) => (
                   <li key={r}>{r}</li>
@@ -245,7 +240,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
               </ul>
             </div>
             <div>
-              <p className="cb-info-label">Risks to monitor</p>
+              <p className="cb-info-label">{t('learn.risks')}</p>
               <ul className="cb-list">
                 {analysis.risks.map((r) => (
                   <li key={r}>{r}</li>
