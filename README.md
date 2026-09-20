@@ -25,6 +25,8 @@ Optional: copy `.env.example` to `.env` and set either:
 - `VITE_NEXOS_API_KEY` for real nexos Gateway, or
 - `VITE_LLM_API_KEY` for a **free LLM stand-in** (Groq recommended) that uses the same instructions + knowledge-base pattern as a nexos agent.
 
+For the **GitHub Pages demo**, the same `VITE_LLM_*` values are stored as repository secrets and injected at build time so live chat works on the public site. Treat that as demo-only (the key is visible in the browser bundle); rotate the Groq key after client demos.
+
 ## Deploy
 
 Pushes to `main` deploy automatically to GitHub Pages via `.github/workflows/deploy-pages.yml`.

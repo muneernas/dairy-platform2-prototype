@@ -31,6 +31,12 @@ jobs:
         run: npm ci
 
       - name: Build application
+        env:
+          # Baked into the public JS at build time so the Pages demo can call Groq.
+          # Demo-only: anyone can extract VITE_* from the bundle — rotate the key after the meeting.
+          VITE_LLM_API_KEY: ${{ secrets.VITE_LLM_API_KEY }}
+          VITE_LLM_BASE_URL: ${{ secrets.VITE_LLM_BASE_URL }}
+          VITE_LLM_MODEL: ${{ secrets.VITE_LLM_MODEL }}
         run: npm run build
 
       - name: Configure GitHub Pages
