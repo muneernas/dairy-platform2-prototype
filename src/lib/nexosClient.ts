@@ -7,4 +7,5 @@ export {
   askNexosStyleForecastAgent as askForecastAgent,
   type AgentChatReply as AgentResponse,
   type AgentReplySource as AgentResponseSource,
+  type ChatTurn,
 } from './nexosStyleAgent'

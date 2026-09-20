@@ -1,11 +1,18 @@
 /**
  * Nexos-style stand-in agent: fixed instructions + knowledge retrieval +
- * OpenAI-compatible chat (Groq / Gemini free tiers, or real nexos later).
+ * OpenAI-compatible multi-turn chat (Groq / Gemini free tiers, or real nexos later).
  */
 
 import { retrieveKnowledge, type KnowledgeChunk } from '../data/forecastKnowledgeBase'
 
 export type AgentReplySource = 'nexos' | 'stand-in' | 'mock'
+
+export type ChatRole = 'user' | 'assistant'
+
+export interface ChatTurn {
+  role: ChatRole
+  content: string
+}
 
 export interface AgentChatReply {
   content: string
@@ -20,7 +27,8 @@ export const FORECAST_AGENT_INSTRUCTIONS = `You are the Platform 2 Demand Foreca
 
 ## Job
 - Forecast next-period demand by SKU from the provided sales table and optional external signals.
-- Answer follow-up questions briefly in plain language (3–6 short sentences).
+- Chat naturally: answer follow-ups briefly in plain language (2–5 short sentences).
+- Remember the conversation — refer to earlier questions when useful.
 - A person always reviews before acting. You do not change ERP, production, or stock.
 
 ## Dairy context
@@ -34,15 +42,19 @@ export const FORECAST_AGENT_INSTRUCTIONS = `You are the Platform 2 Demand Foreca
 
 ## Result style
 - Stay practical for a small dairy manager.
-- When relevant, mention risks (waste/stockout) and one clear next action.`
+- When relevant, mention risks (waste/stockout) and one clear next action.
+- Do not dump the whole knowledge base; answer the latest question.`
 
-function buildSystemPrompt(knowledge: KnowledgeChunk[]): string {
+function buildSystemPrompt(knowledge: KnowledgeChunk[], runContext: string): string {
   const kb =
     knowledge.length === 0
       ? '(no knowledge excerpts)'
       : knowledge.map((k) => `### ${k.title}\n${k.body}`).join('\n\n')
 
   return `${FORECAST_AGENT_INSTRUCTIONS}
+
+## This agent run (fixed context for the whole chat)
+${runContext}
 
 ## Knowledge base excerpts (treat as attached nexos knowledge)
 ${kb}`
@@ -53,7 +65,7 @@ async function callOpenAiCompatible(opts: {
   apiKey: string
   model: string
   system: string
-  user: string
+  messages: ChatTurn[]
 }): Promise<{ text: string | null; error?: string }> {
   const base = opts.baseUrl.replace(/\/$/, '')
   let res: Response
@@ -66,12 +78,9 @@ async function callOpenAiCompatible(opts: {
       },
       body: JSON.stringify({
         model: opts.model,
-        messages: [
-          { role: 'system', content: opts.system },
-          { role: 'user', content: opts.user },
-        ],
+        messages: [{ role: 'system', content: opts.system }, ...opts.messages],
         max_tokens: 800,
-        temperature: 0.3,
+        temperature: 0.35,
       }),
     })
   } catch (err) {
@@ -93,7 +102,6 @@ async function callOpenAiCompatible(opts: {
   const content = message?.content?.trim()
   if (content) return { text: content }
 
-  // Some Groq "oss" models fill reasoning first; content can be empty if max_tokens is tight
   const reasoning = message?.reasoning?.trim()
   if (reasoning) {
     const trimmed = reasoning.replace(/^[\s\S]*?(?=\n\n|[A-Z])/u, '').trim()
@@ -104,7 +112,7 @@ async function callOpenAiCompatible(opts: {
 }
 
 /**
- * Ask the forecast agent. Preference order:
+ * Ask the forecast agent (multi-turn). Preference order:
  * 1) Real nexos Gateway (if VITE_NEXOS_API_KEY)
  * 2) Free/OpenAI-compatible stand-in (Groq / Gemini) + local KB
  * 3) Offline heuristic mock
@@ -112,11 +120,12 @@ async function callOpenAiCompatible(opts: {
 export async function askNexosStyleForecastAgent(
   userQuestion: string,
   runContext: string,
+  history: ChatTurn[] = [],
 ): Promise<AgentChatReply> {
   const knowledge = retrieveKnowledge(userQuestion)
   const knowledgeUsed = knowledge.map((k) => k.title)
-  const system = buildSystemPrompt(knowledge)
-  const user = `## This run's data / insight\n${runContext}\n\n## Learner question\n${userQuestion}`
+  const system = buildSystemPrompt(knowledge, runContext)
+  const messages: ChatTurn[] = [...history, { role: 'user', content: userQuestion }]
 
   const nexosKey = (import.meta.env.VITE_NEXOS_API_KEY as string | undefined)?.trim()
   if (nexosKey) {
@@ -125,7 +134,7 @@ export async function askNexosStyleForecastAgent(
       apiKey: nexosKey,
       model: (import.meta.env.VITE_NEXOS_MODEL as string | undefined) ?? 'GPT 5 mini',
       system,
-      user,
+      messages,
     })
     if (result.text) return { content: result.text, source: 'nexos', knowledgeUsed }
   }
@@ -139,7 +148,7 @@ export async function askNexosStyleForecastAgent(
       apiKey: llmKey,
       model: (import.meta.env.VITE_LLM_MODEL as string | undefined) ?? 'qwen/qwen3.8-27b',
       system,
-      user,
+      messages,
     })
     if (result.text) return { content: result.text, source: 'stand-in', knowledgeUsed }
     return {
@@ -189,6 +198,11 @@ function offlineForecastAnswer(question: string, knowledge: KnowledgeChunk[]): s
       'Export weekly sales by SKU/channel, optionally add a signals calendar, run the same agent, and have a manager review before locking the plan. ' +
       'The agent does not write back to ERP. ' +
       (fromKb ? `KB note: ${fromKb.slice(0, 180)}…` : '')
+    )
+  }
+  if (q.includes('hello') || q.includes('hi ') || q === 'hi' || q.includes('help')) {
+    return (
+      'I can explain this forecast run — yogurt volatility, external signals, waste risk, or how to apply it to your company file. What do you want to dig into?'
     )
   }
 
