@@ -8,6 +8,7 @@ import {
 import { runForecastAgent } from '../lib/forecastAgent'
 import { downloadTextFile, parseCsv } from '../lib/parseCsv'
 import type { ApplyDataItem } from '../types/platform2'
+import { AgentFollowUpChat } from './AgentFollowUpChat'
 
 type ItemSource = 'demo' | 'upload'
 
@@ -252,6 +253,22 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
               </ul>
             </div>
           </div>
+          <AgentFollowUpChat
+            runContext={[
+              `Company / file: ${analysis.companyLabel}`,
+              `Rows: ${analysis.rowCount}, SKUs: ${analysis.skuCount}, periods: ${analysis.periodCount}`,
+              `Forecasts:\n${analysis.forecasts
+                .map((f) => `- ${f.sku}: ${f.forecastUnits} (${f.trend}, ${f.volatility} volatility)`)
+                .join('\n')}`,
+              analysis.eventsUsed.length
+                ? `External signals:\n${analysis.eventsUsed.map((e) => `- ${e}`).join('\n')}`
+                : '',
+              `Recommendations: ${analysis.recommendations.join('; ')}`,
+              `Risks: ${analysis.risks.join('; ')}`,
+            ]
+              .filter(Boolean)
+              .join('\n')}
+          />
         </div>
       )}
     </div>

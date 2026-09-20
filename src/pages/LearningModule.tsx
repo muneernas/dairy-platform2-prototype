@@ -4,12 +4,9 @@ import { ArrowLeft, ArrowRight, CheckCircle2, ChevronDown, Sparkles } from 'luci
 import { OptionChips } from '../components/OptionChips'
 import { ProgressBar } from '../components/ProgressBar'
 import { CompanyApplyStep } from '../components/CompanyApplyStep'
+import { AgentFollowUpChat } from '../components/AgentFollowUpChat'
 import { getModuleDetail } from '../data/learningModules'
-import { askForecastAgent } from '../lib/nexosClient'
-import {
-  answerForecastFollowUp,
-  runForecastAgentOnPractice,
-} from '../lib/forecastAgent'
+import { runForecastAgentOnPractice } from '../lib/forecastAgent'
 import type { CompanyAnalysis } from '../lib/companyForecast'
 import {
   MODULE_STEPS,
@@ -41,19 +38,11 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
   const [agentRevealed, setAgentRevealed] = useState(false)
   const [agentRunning, setAgentRunning] = useState(false)
   const [liveInsight, setLiveInsight] = useState<AgentInsight | null>(null)
-  const [showAgentAsk, setShowAgentAsk] = useState(false)
   const [exerciseAnswers, setExerciseAnswers] = useState<Record<string, string>>({})
   const [exerciseFeedback, setExerciseFeedback] = useState<Record<string, 'correct' | 'incorrect'>>({})
   const [assessmentAnswers, setAssessmentAnswers] = useState<Record<string, string>>({})
   const [assessmentFeedback, setAssessmentFeedback] = useState<Record<string, boolean>>({})
   const [companyAnalysis, setCompanyAnalysis] = useState<CompanyAnalysis | null>(null)
-  const [agentQuestion, setAgentQuestion] = useState('')
-  const [agentReply, setAgentReply] = useState<{
-    content: string
-    source: 'nexos' | 'stand-in' | 'mock'
-    knowledgeUsed?: string[]
-  } | null>(null)
-  const [agentLoading, setAgentLoading] = useState(false)
 
   const currentStep = MODULE_STEPS[stepIndex]
   const progress = phase === 'learning' ? ((stepIndex + 1) / MODULE_STEPS.length) * 100 : 0
@@ -84,7 +73,6 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
 
   async function handleRunForecastAgent() {
     setAgentRunning(true)
-    setAgentReply(null)
     // Short delay so the demo feels like an agent run (nexos would take similar time)
     await new Promise((r) => window.setTimeout(r, 1100))
     const result = runForecastAgentOnPractice(
@@ -97,54 +85,37 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     setAgentRunning(false)
   }
 
-  async function handleAskAgent() {
-    if (!agentQuestion.trim()) return
-    setAgentLoading(true)
-    const context = [
-      `Company: ${module.companyProfile.name}`,
-      `Headline: ${insight.headline}`,
-      `Summary: ${insight.summary}`,
-      insight.forecasts?.length
-        ? `Forecasts:\n${insight.forecasts
-            .map((f) => `- ${f.sku}: ${f.forecastUnits} (${f.trend}) for ${f.nextPeriod}`)
-            .join('\n')}`
-        : '',
-      insight.recommendations?.length
-        ? `Recommendations: ${insight.recommendations.join('; ')}`
-        : '',
-      insight.risks?.length ? `Risks: ${insight.risks.join('; ')}` : '',
-      insight.externalSignalsUsed?.length
-        ? `Signals used:\n${insight.externalSignalsUsed
-            .map((s) => `- ${s.period} ${s.eventName} → ${s.linkedSkus}`)
-            .join('\n')}`
-        : '',
-      'Recent sales rows:',
-      module.simulatedData
-        .slice(-8)
-        .map((r) => `${r.period} ${r.sku}: ${r.unitsSold} (${r.channel})`)
-        .join('\n'),
-      module.externalSignals?.length
-        ? `External signals calendar:\n${module.externalSignals
-            .map((e) => `${e.period} ${e.eventName} (${e.eventType})`)
-            .join('\n')}`
-        : '',
-    ]
-      .filter(Boolean)
-      .join('\n')
-
-    const reply = await askForecastAgent(agentQuestion, context)
-    // If LLM/nexos unavailable, enrich offline answer with local follow-up when we have a live run
-    if (reply.source === 'mock' && liveInsight) {
-      setAgentReply({
-        content: answerForecastFollowUp(agentQuestion, liveInsight),
-        source: 'mock',
-        knowledgeUsed: reply.knowledgeUsed,
-      })
-    } else {
-      setAgentReply(reply)
-    }
-    setAgentLoading(false)
-  }
+  const practiceChatContext = [
+    `Company: ${module.companyProfile.name}`,
+    `Headline: ${insight.headline}`,
+    `Summary: ${insight.summary}`,
+    insight.forecasts?.length
+      ? `Forecasts:\n${insight.forecasts
+          .map((f) => `- ${f.sku}: ${f.forecastUnits} (${f.trend}) for ${f.nextPeriod}`)
+          .join('\n')}`
+      : '',
+    insight.recommendations?.length
+      ? `Recommendations: ${insight.recommendations.join('; ')}`
+      : '',
+    insight.risks?.length ? `Risks: ${insight.risks.join('; ')}` : '',
+    insight.externalSignalsUsed?.length
+      ? `Signals used:\n${insight.externalSignalsUsed
+          .map((s) => `- ${s.period} ${s.eventName} → ${s.linkedSkus}`)
+          .join('\n')}`
+      : '',
+    'Recent sales rows:',
+    module.simulatedData
+      .slice(-8)
+      .map((r) => `${r.period} ${r.sku}: ${r.unitsSold} (${r.channel})`)
+      .join('\n'),
+    module.externalSignals?.length
+      ? `External signals calendar:\n${module.externalSignals
+          .map((e) => `${e.period} ${e.eventName} (${e.eventType})`)
+          .join('\n')}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n')
 
   function canAdvanceStep(): boolean {
     switch (currentStep.id) {
@@ -184,7 +155,6 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
     setShowFullData(false)
     setAgentRevealed(false)
     setLiveInsight(null)
-    setShowAgentAsk(false)
   }
 
   function goPrevStep() {
@@ -446,49 +416,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                     </ul>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="cb-expand-btn"
-                  onClick={() => setShowAgentAsk((v) => !v)}
-                  aria-expanded={showAgentAsk}
-                >
-                  {showAgentAsk ? 'Hide follow-up question' : 'Ask a follow-up question'}
-                  <ChevronDown size={16} className={showAgentAsk ? 'is-open' : ''} />
-                </button>
-                {showAgentAsk && (
-                  <div className="cb-ask">
-                    <textarea
-                      value={agentQuestion}
-                      onChange={(e) => setAgentQuestion(e.target.value)}
-                      placeholder="e.g. Why is yogurt flagged as high volatility?"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={handleAskAgent}
-                      disabled={agentLoading || !agentQuestion.trim()}
-                    >
-                      {agentLoading ? 'Thinking…' : 'Submit question'}
-                    </button>
-                    {agentReply && (
-                      <div className="cb-agent-reply">
-                        <span className="cb-agent-engine">
-                          {agentReply.source === 'nexos'
-                            ? 'nexos.ai'
-                            : agentReply.source === 'stand-in'
-                              ? 'nexos-style stand-in (free LLM + knowledge base)'
-                              : 'Offline stand-in (knowledge base heuristics)'}
-                        </span>
-                        {agentReply.content}
-                        {agentReply.knowledgeUsed && agentReply.knowledgeUsed.length > 0 && (
-                          <p className="cb-kb-used">
-                            Knowledge used: {agentReply.knowledgeUsed.join(' · ')}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
+                <AgentFollowUpChat runContext={practiceChatContext} />
               </>
             )}
           </div>
