@@ -219,6 +219,9 @@ const en: Dict = {
   'apply.periods': 'Periods',
   'apply.nextPeriod': 'Next period: {units} units',
   'apply.volatility': '{level} volatility',
+  'apply.supportFiles': 'Support files used',
+  'apply.coreFiles': 'Core files',
+  'apply.enrichmentFiles': 'Optional enrichment',
   'apply.errorRead':
     'Could not read {name}. Use a CSV with a header row, or load the demo file.',
   'apply.errorCols':
@@ -440,6 +443,9 @@ const ar: Dict = {
   'apply.periods': 'فترات',
   'apply.nextPeriod': 'الفترة التالية: {units} وحدة',
   'apply.volatility': 'تقلب {level}',
+  'apply.supportFiles': 'الملفات الداعمة المستخدمة',
+  'apply.coreFiles': 'الملفات الأساسية',
+  'apply.enrichmentFiles': 'إثراء اختياري',
   'apply.errorRead': 'تعذّر قراءة {name}. استخدم CSV مع صف عناوين، أو حمّل ملف العرض.',
   'apply.errorCols':
     '{name} يحتاج أعمدة مثل period و sku و units. حمّل ملف العرض لرؤية التنسيق.',
@@ -662,6 +668,9 @@ const fr: Dict = {
   'apply.periods': 'Périodes',
   'apply.nextPeriod': 'Période suivante : {units} unités',
   'apply.volatility': 'volatilité {level}',
+  'apply.supportFiles': 'Fichiers de support utilisés',
+  'apply.coreFiles': 'Fichiers principaux',
+  'apply.enrichmentFiles': 'Enrichissement optionnel',
   'apply.errorRead':
     'Impossible de lire {name}. Utilisez un CSV avec en-tête, ou chargez le fichier de démo.',
   'apply.errorCols':
@@ -885,6 +894,9 @@ const el: Dict = {
   'apply.periods': 'Περίοδοι',
   'apply.nextPeriod': 'Επόμενη περίοδος: {units} μονάδες',
   'apply.volatility': 'μεταβλητότητα {level}',
+  'apply.supportFiles': 'Αρχεία υποστήριξης που χρησιμοποιήθηκαν',
+  'apply.coreFiles': 'Βασικά αρχεία',
+  'apply.enrichmentFiles': 'Προαιρετικός εμπλουτισμός',
   'apply.errorRead':
     'Αδυναμία ανάγνωσης {name}. Χρησιμοποιήστε CSV με κεφαλίδα ή φορτώστε το demo.',
   'apply.errorCols':

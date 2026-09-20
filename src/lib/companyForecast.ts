@@ -32,6 +32,10 @@ export interface CompanyAnalysis {
   recommendations: string[]
   risks: string[]
   eventsUsed: string[]
+  /** Optional enrichment files attached for this run (beyond sales). */
+  supportFilesUsed?: string[]
+  /** Short CSV previews of enrichment files for follow-up chat grounding. */
+  supportContext?: string
 }
 
 const SALES_ALIASES = {

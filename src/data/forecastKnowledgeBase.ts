@@ -39,7 +39,7 @@ export const FORECAST_KNOWLEDGE_BASE: KnowledgeChunk[] = [
     id: 'file-rules',
     title: 'Required sales file columns',
     tags: ['csv', 'file', 'column', 'upload', 'data', 'missing'],
-    body: `Sales file should include: period (e.g. Week 5), sku, category, unitsSold, channel. Missing weeks or blank units must be flagged - do not invent volumes. External signals file (optional): period, eventName, eventType (school_term, holiday, ramadan, promotion, weather, other), expectedImpact. Wrong column names should stop the run with a clear error.`,
+    body: `Sales file should include: period (e.g. Week 5), sku, category, unitsSold, channel. Missing weeks or blank units must be flagged - do not invent volumes. External signals file (optional): period, eventName, eventType (school_term, holiday, ramadan, promotion, weather, other), expectedImpact. Further optional enrichment files (open orders, promo plan, price list, weather series, capacity, stock, returns) improve context when present; the agent still forecasts from sales first. Wrong column names should stop the run with a clear error.`,
   },
   {
     id: 'waste-risk',
