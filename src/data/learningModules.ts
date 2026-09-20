@@ -1,14 +1,14 @@
 import type { LearningModuleMeta, ModuleDetail } from '../types/platform2'
 import { FORECAST_APPLY_ITEMS } from './demoCompanyData'
 
-/** Ten training courses — aligned with Platform 2 proposal, Aug 2026 */
+/** Ten training courses - aligned with Platform 2 proposal, Aug 2026 */
 export const LEARNING_MODULES: LearningModuleMeta[] = [
   {
     id: 'ai-platforms',
     number: 1,
     title: 'Using AI platforms and designing simple agents',
     description:
-      'Introduces SMEs to AI platforms for designing simple agents linked to business tasks — preparing data, defining instructions, testing outputs, and integrating recommendations into daily decisions.',
+      'Introduces SMEs to AI platforms for designing simple agents linked to business tasks - preparing data, defining instructions, testing outputs, and integrating recommendations into daily decisions.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [
@@ -23,7 +23,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 2,
     title: 'Demand forecasting with an AI forecasting agent',
     description:
-      'Trains companies to use historical sales, customer orders, seasonality, and external signals to estimate future demand by product category or SKU — reducing waste, preventing stockouts, and improving production planning.',
+      'Trains companies to use historical sales, customer orders, seasonality, and external signals to estimate future demand by product category or SKU - reducing waste, preventing stockouts, and improving production planning.',
     status: 'pilot',
     duration: 'About 10 minutes',
     fullDuration: '45–90 minutes',
@@ -39,7 +39,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 3,
     title: 'Sales and order analysis with an AI sales agent',
     description:
-      'Focuses on analysing confirmed and pending orders by product, customer, channel, and delivery date — identifying demand signals, customer patterns, and coordination needs between sales, production, and logistics.',
+      'Focuses on analysing confirmed and pending orders by product, customer, channel, and delivery date - identifying demand signals, customer patterns, and coordination needs between sales, production, and logistics.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -49,7 +49,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 4,
     title: 'Production planning and sequencing with an AI production-planning agent',
     description:
-      'Shows how forecasted and confirmed demand becomes a feasible production plan and run sequence — line capacity, materials, changeovers, and cleaning on milk, yoghurt, and cheese lines.',
+      'Shows how forecasted and confirmed demand becomes a feasible production plan and run sequence - line capacity, materials, changeovers, and cleaning on milk, yoghurt, and cheese lines.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -59,7 +59,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 5,
     title: 'Inventory monitoring with an AI inventory agent',
     description:
-      'Helps SMEs track finished goods, raw materials, packaging, and semi-finished products across batches and locations — detecting shortages, excess stock, slow-moving items, and operational constraints.',
+      'Helps SMEs track finished goods, raw materials, packaging, and semi-finished products across batches and locations - detecting shortages, excess stock, slow-moving items, and operational constraints.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -69,7 +69,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 6,
     title: 'Shelf-life management with an AI shelf-life agent',
     description:
-      'Focuses on expiry dates, remaining shelf life, batch age, and product usability — supporting FEFO dispatching, loss reduction, and stock rotation decisions.',
+      'Focuses on expiry dates, remaining shelf life, batch age, and product usability - supporting FEFO dispatching, loss reduction, and stock rotation decisions.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -79,7 +79,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 7,
     title: 'Milk procurement with an AI supplier agent',
     description:
-      'Trains companies to use AI for raw milk procurement and purchasing of ingredients, cultures, packaging, and other inputs — combining supplier prices, lead times, quality, and reliability.',
+      'Trains companies to use AI for raw milk procurement and purchasing of ingredients, cultures, packaging, and other inputs - combining supplier prices, lead times, quality, and reliability.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -89,7 +89,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 8,
     title: 'Predictive maintenance with an AI maintenance agent',
     description:
-      'Introduces maintenance data, downtime records, alarms, and asset information to identify equipment at risk of failure — relevant for pasteurisers, fillers, pumps, refrigeration, compressors, and CIP assets.',
+      'Introduces maintenance data, downtime records, alarms, and asset information to identify equipment at risk of failure - relevant for pasteurisers, fillers, pumps, refrigeration, compressors, and CIP assets.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -109,7 +109,7 @@ export const LEARNING_MODULES: LearningModuleMeta[] = [
     number: 10,
     title: 'Customer complaint analysis with an AI complaint agent',
     description:
-      'Trains companies to organise and analyse complaints related to quality, packaging, delivery conditions, temperature abuse, and expiry — linking data to batches and corrective action.',
+      'Trains companies to organise and analyse complaints related to quality, packaging, delivery conditions, temperature abuse, and expiry - linking data to batches and corrective action.',
     status: 'planned',
     duration: '45–90 minutes',
     learningObjectives: [],
@@ -133,8 +133,8 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
   ],
   companyProfile: {
     name: 'Al-Balqa Fresh Dairy (simulated)',
-    type: 'Small dairy SME — fresh products',
-    location: 'Jordan — retail + horeca channels',
+    type: 'Small dairy SME - fresh products',
+    location: 'Jordan - retail + horeca channels',
     note: 'This is a simulated company dataset for training. Your own data would follow the same structure.',
   },
   simulatedData: [
@@ -177,7 +177,7 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
       eventName: 'School term start',
       eventType: 'school_term',
       expectedImpact: 'yogurt_up',
-      notes: 'Back-to-school breakfast demand — explains yogurt spike',
+      notes: 'Back-to-school breakfast demand - explains yogurt spike',
     },
     {
       period: 'Week 6',
@@ -199,9 +199,9 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
       id: 'ex1',
       prompt: 'Weeks 5–6 show a clear spike for plain yogurt. Which external signal best explains it?',
       context:
-        'Compare the sales table with the external signals calendar — Week 5 has school term start; Week 6 has a retail promotion.',
+        'Compare the sales table with the external signals calendar - Week 5 has school term start; Week 6 has a retail promotion.',
       options: [
-        { value: 'a', label: 'School term start (Week 5)', description: 'External signal — breakfast yogurt lift' },
+        { value: 'a', label: 'School term start (Week 5)', description: 'External signal - breakfast yogurt lift' },
         { value: 'b', label: 'Packaging machine failure', description: 'Would reduce output, not lift sales' },
         { value: 'c', label: 'Cold-room temperature drift', description: 'Affects quality, not recorded sales lift' },
         { value: 'd', label: 'Random data error only', description: 'Pattern aligns with tagged calendar events' },
@@ -228,7 +228,7 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
         correct:
           'Correct. Yogurt shows the highest volatility. Production should use a forecast band (min / expected / max) rather than a single point estimate to avoid overproduction waste after the spike.',
         incorrect:
-          'Milk and cheese show smoother trends. Yogurt has the steepest rise and partial correction — the riskiest forecast error for a perishable SKU.',
+          'Milk and cheese show smoother trends. Yogurt has the steepest rise and partial correction - the riskiest forecast error for a perishable SKU.',
       },
     },
     {
@@ -243,14 +243,14 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
       correctValue: 'review',
       feedback: {
         correct:
-          'Correct. Capacity building means integrating AI recommendations into existing decision routines — not removing human judgment, especially for perishable products.',
+          'Correct. Capacity building means integrating AI recommendations into existing decision routines - not removing human judgment, especially for perishable products.',
         incorrect:
           'Platform 2 aims to strengthen company capability. The forecast should inform a cross-functional review (sales signals + production constraints), not run unattended or be discarded.',
       },
     },
   ],
   agentInsight: {
-    headline: 'Week 9 demand forecast — AI agent output',
+    headline: 'Week 9 demand forecast - AI agent output',
     summary:
       'Based on 8 weeks of simulated sales plus external signals, the agent links the Week 5–6 yogurt spike to school term start and a retail promotion. Week 9 forecast mean-reverts yogurt from the peak while milk eases after the holiday weekend tagged in Week 9.',
     externalSignalsUsed: [
@@ -280,9 +280,9 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
       { sku: 'Labneh 400g', nextPeriod: 'Week 9', forecastUnits: 885, trend: 'stable' },
     ],
     recommendations: [
-      'Yogurt spike is explained by school term + promotion — confirm with sales whether Week 9 still carries promo uplift.',
+      'Yogurt spike is explained by school term + promotion - confirm with sales whether Week 9 still carries promo uplift.',
       'Plan yogurt production with a ±8% tolerance band to limit spoilage if the post-spike correction is faster than expected.',
-      'Hold a short demand review before locking Week 9 — external signals calendar should be updated each month.',
+      'Hold a short demand review before locking Week 9 - external signals calendar should be updated each month.',
     ],
     risks: [
       'Overproduction risk: yogurt (high perishability)',
@@ -327,7 +327,7 @@ export const DEMAND_FORECAST_MODULE: ModuleDetail = {
       ],
       correctValue: 'a',
       ragExplanation:
-        'External signals files tag calendar events (school terms, holidays, promotions, Ramadan) by week so the agent can link spikes in sales to real-world causes — not just statistical noise.',
+        'External signals files tag calendar events (school terms, holidays, promotions, Ramadan) by week so the agent can link spikes in sales to real-world causes - not just statistical noise.',
     },
     {
       id: 'q4',

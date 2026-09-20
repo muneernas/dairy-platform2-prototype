@@ -77,7 +77,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
 
   function runAnalysis() {
     if (!salesItem || !loaded.sales) {
-      setError('Load weekly sales first — use your file or the demo export.')
+      setError('Load weekly sales first - use your file or the demo export.')
       return
     }
     setRunning(true)
@@ -181,7 +181,7 @@ export function CompanyApplyStep({ items, analysis, onAnalysis, intro, runHint }
         <p>
           {salesReady
             ? runHint ??
-              'Sales file is ready. Run the forecasting agent on this dataset — not the training table from earlier in the module.'
+              'Sales file is ready. Run the forecasting agent on this dataset - not the training table from earlier in the module.'
             : 'Load the required sales file (demo or upload) to enable analysis.'}
         </p>
         <button

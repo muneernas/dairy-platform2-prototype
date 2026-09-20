@@ -23,7 +23,7 @@ export function AgentCatalog() {
         <h1>Run an agent on your company data</h1>
         <p className="catalog-lede">
           Upload a CSV export, get structured recommendations, and chat about the results. No
-          lesson required — learning modules stay available if you want the teaching path first.
+          lesson required - learning modules stay available if you want the teaching path first.
         </p>
         <div className="agent-strip" aria-hidden>
           <span>

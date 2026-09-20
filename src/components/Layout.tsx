@@ -56,9 +56,6 @@ export function Layout() {
           </nav>
 
           <div className="topbar-actions">
-            <NavLink to="/agents/demand-forecast" className="btn btn-primary topbar-cta">
-              Run forecast agent
-            </NavLink>
             <button
               type="button"
               className="menu-toggle"
@@ -94,9 +91,6 @@ export function Layout() {
                   {item.label}
                 </NavLink>
               ))}
-              <NavLink to="/agents/demand-forecast" className="btn btn-primary mobile-cta">
-                Run forecast agent
-              </NavLink>
             </motion.nav>
           )}
         </AnimatePresence>

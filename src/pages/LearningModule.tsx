@@ -242,7 +242,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
               <div className="lm-panel-block">
                 <h3>External signals calendar</h3>
                 <p className="cb-muted">
-                  Holidays, school terms, promotions, Ramadan — the same optional file you can upload
+                  Holidays, school terms, promotions, Ramadan - the same optional file you can upload
                   later.
                 </p>
                 <div className="cb-table-wrap">
@@ -263,7 +263,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                           <td>
                             <span className="cb-signal-type">{row.eventType.replace(/_/g, ' ')}</span>
                           </td>
-                          <td>{row.expectedImpact?.replace(/_/g, ' ') ?? '—'}</td>
+                          <td>{row.expectedImpact?.replace(/_/g, ' ') ?? '-'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -349,7 +349,7 @@ function LearningModuleRunner({ module }: { module: ModuleDetail }) {
                 </div>
                 <p>
                   Run the forecasting agent on the practice sales table and external signals. Same
-                  file-in → insights-out pattern as production — then chat about the results.
+                  file-in → insights-out pattern as production - then chat about the results.
                 </p>
                 <button
                   type="button"

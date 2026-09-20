@@ -61,7 +61,7 @@ export function Welcome() {
           </motion.h1>
           <motion.p className="home-lede" variants={fadeUp} custom={2}>
             A practical platform for dairy companies: learn with guided training, then put AI agents
-            to work on your own sales and operations files — without leaving the programme.
+            to work on your own sales and operations files - without leaving the programme.
           </motion.p>
           <motion.div className="home-cta-row" variants={fadeUp} custom={3}>
             <Link to="/pathways" className="btn btn-primary btn-lg">
@@ -151,7 +151,7 @@ export function Welcome() {
           <p className="home-eyebrow">Learning</p>
           <h2>Training that mirrors the plant floor</h2>
           <p>
-            Self-paced modules with practice tables, exercises, and a knowledge check — then the
+            Self-paced modules with practice tables, exercises, and a knowledge check - then the
             same agent on a company file.
           </p>
           {pilotCourse && (

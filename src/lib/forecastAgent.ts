@@ -107,17 +107,17 @@ export function runForecastAgent(input: {
   const highVol = analysis.forecasts.filter((f) => f.volatility === 'high')
   const signalBit = topSignal
     ? ` Main external signal in view: ${topSignal.eventName} (${topSignal.period}) linked to ${topSignal.linkedSkus}.`
-    : ' No external signals file was attached — forecast is sales-history only.'
+    : ' No external signals file was attached - forecast is sales-history only.'
 
   const insight: AgentInsight = {
-    headline: `${nextPeriod} demand forecast — ${analysis.skuCount} products`,
+    headline: `${nextPeriod} demand forecast - ${analysis.skuCount} products`,
     summary:
       `Based on ${analysis.periodCount} weeks of sales` +
       (input.events.length ? ` plus ${input.events.length} external signal(s)` : '') +
       `, the agent projects ${nextPeriod} volume by SKU.` +
       signalBit +
       (highVol.length
-        ? ` Highest volatility: ${highVol.map((f) => f.sku).join(', ')} — use a band, not a single number.`
+        ? ` Highest volatility: ${highVol.map((f) => f.sku).join(', ')} - use a band, not a single number.`
         : ' Volatility is moderate across SKUs.'),
     externalSignalsUsed: linkedSignals.length ? linkedSignals : undefined,
     forecasts: analysis.forecasts.map((f) => ({

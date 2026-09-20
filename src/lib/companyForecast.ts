@@ -129,13 +129,13 @@ export function analyseCompanySales(
       ? 'External signals explain the yogurt spike (school term / promotion). Confirm with sales before locking Week 9 volume.'
       : null,
     highVol.length
-      ? `Use a forecast band (not a single number) for ${highVol.map((f) => f.sku).join(', ')} — perishable SKUs with high volatility.`
+      ? `Use a forecast band (not a single number) for ${highVol.map((f) => f.sku).join(', ')} - perishable SKUs with high volatility.`
       : 'Volatility is moderate across SKUs. Keep a short weekly review before locking production.',
     rising.length
       ? `Confirm capacity and milk intake for rising SKUs: ${rising.map((f) => f.sku).join(', ')}.`
-      : 'No sharp upward SKUs this period — watch for under-production if orders rebound.',
+      : 'No sharp upward SKUs this period - watch for under-production if orders rebound.',
     eventsUsed.length
-      ? `${eventsUsed.length} external signal(s) loaded — recheck the plan against those calendar dates.`
+      ? `${eventsUsed.length} external signal(s) loaded - recheck the plan against those calendar dates.`
       : 'No external signals file attached. Add holidays, school terms, and promotions to explain spikes.',
   ].filter(Boolean) as string[]
 
@@ -156,7 +156,7 @@ export function analyseCompanySales(
     periodCount: periods.size,
     forecasts,
     recommendations,
-    risks: risks.length ? risks : ['No major risk flags from this dataset — still review with sales before locking the plan.'],
+    risks: risks.length ? risks : ['No major risk flags from this dataset - still review with sales before locking the plan.'],
     eventsUsed,
   }
 }

@@ -127,6 +127,6 @@ export const MODULE_STEPS: { id: ModuleStepId; label: string; description: strin
   {
     id: 'apply-company',
     label: 'Apply to your company',
-    description: 'Upload your operational files — or use the demo company export — and run the same analysis',
+    description: 'Upload your operational files - or use the demo company export - and run the same analysis',
   },
 ]

@@ -52,7 +52,7 @@ export function AgentWorkspace() {
           items={detail.applyItems}
           analysis={analysis}
           onAnalysis={setAnalysis}
-          intro="Upload your company CSV, or use the demo export to try the agent. There is no lesson on this path — the agent runs on the files you attach."
+          intro="Upload your company CSV, or use the demo export to try the agent. There is no lesson on this path - the agent runs on the files you attach."
           runHint="Files are ready. Run the agent on this dataset."
         />
       </section>

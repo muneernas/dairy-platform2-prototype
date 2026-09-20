@@ -36,7 +36,7 @@ export function AgentFollowUpChat({
       id: 'welcome',
       role: 'assistant',
       content:
-        'I’ve analysed this run. Ask me anything about the forecast, external signals, risks, or what to do next — I’ll reply in this chat.',
+        'I’ve analysed this run. Ask me anything about the forecast, external signals, risks, or what to do next - I’ll reply in this chat.',
       source: 'stand-in',
     },
   ])
@@ -97,7 +97,7 @@ export function AgentFollowUpChat({
         <div>
           <p className="cb-info-label">Chat with the forecast agent</p>
           <p className="cb-muted cb-ask-hint">
-            Multi-turn Q&amp;A on this run — same pattern as a nexos agent follow-up.
+            Multi-turn Q&amp;A on this run - same pattern as a nexos agent follow-up.
           </p>
         </div>
       </div>

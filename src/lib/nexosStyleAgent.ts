@@ -28,7 +28,7 @@ export const FORECAST_AGENT_INSTRUCTIONS = `You are the Platform 2 Demand Foreca
 ## Job
 - Forecast next-period demand by SKU from the provided sales table and optional external signals.
 - Chat naturally: answer follow-ups briefly in plain language (2–5 short sentences).
-- Remember the conversation — refer to earlier questions when useful.
+- Remember the conversation - refer to earlier questions when useful.
 - A person always reviews before acting. You do not change ERP, production, or stock.
 
 ## Dairy context
@@ -164,7 +164,7 @@ export async function askNexosStyleForecastAgent(
     source: 'mock',
     knowledgeUsed,
     fallbackReason:
-      'No VITE_LLM_API_KEY in this build (GitHub Pages has no key — use npm run dev locally)',
+      'No VITE_LLM_API_KEY in this build (GitHub Pages has no key - use npm run dev locally)',
   }
 }
 
@@ -202,7 +202,7 @@ function offlineForecastAnswer(question: string, knowledge: KnowledgeChunk[]): s
   }
   if (q.includes('hello') || q.includes('hi ') || q === 'hi' || q.includes('help')) {
     return (
-      'I can explain this forecast run — yogurt volatility, external signals, waste risk, or how to apply it to your company file. What do you want to dig into?'
+      'I can explain this forecast run - yogurt volatility, external signals, waste risk, or how to apply it to your company file. What do you want to dig into?'
     )
   }
 
